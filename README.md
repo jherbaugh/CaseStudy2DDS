@@ -29,11 +29,11 @@ The Data Sets
 * ['Case2PredictionsClassifyEXAMPLE.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2PredictionsClassifyEXAMPLE.csv) - Classification model example.
 * ['Case2PredictionsRegressEXAMPLE.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2PredictionsRegressEXAMPLE.csv) - Regression model example.
 
-* ['CaseStudy2CompSet No Attrition.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/CaseStudy2CompSet No Attrition.csv) - ValidationDataset with no attrition.
-* ['CaseStudy2CompSet No Salary.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/CaseStudy2CompSet No Salary.csv.csv) - ValidationDataset with no salary.
+* ['CaseStudy2CompSetNoAttrition.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/CaseStudy2CompSet No Attrition.csv) - ValidationDataset with no attrition.
+* ['CaseStudy2CompSetNoSalary.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/CaseStudy2CompSet No Salary.csv.csv) - ValidationDataset with no salary.
 
-* ['Case2Predictions_Herbaugh Attrition.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2Predictions_Herbaugh Attrition.csv) - Output of my RF model for classification.
-* ['Case2Predictions_Herbaugh Salary.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2Predictions_Herbaugh Salary.csv) - Output of my RF model for regression.
+* ['Case2PredictionsHerbaughAttrition.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2Predictions_Herbaugh Attrition.csv) - Output of my RF model for classification.
+* ['Case2PredictionsHerbaughSalary.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2Predictions_Herbaugh Salary.csv) - Output of my RF model for regression.
 
 ## Analysis
 
