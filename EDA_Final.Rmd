@@ -12,8 +12,13 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+Executive Summary
 
-For this case study we assume that our audience is the CEO and CFO of Budweiser (our client). They have hired us to answer 7 questions and beyond those general questions we will speculate / anticipate what may be of interest to them.
+DDSAnalytics is an analytics company specializing in talent management solutions for Fortune 100 companies. To gain a competitive edge over the competition they want to use data science for talent management. They want to investigate employee turnover to identify factors that contribute to attrition. 
+
+Project Overview
+
+My EDA will consists of running summary statistics against the data provided. Inspecting the correlation matrix I will see what variables are multicollinear. In addition to the Boruta Feature selection,I will remove some unimportant variables from the dataset. Additionally, I will also plot interesting relationships between the variables. Finally, i will run through a multitude of models for both attrition classification and salary regression and output the results to the validation set. 
 
 
 ```{r}
@@ -50,7 +55,7 @@ library(doParallel)
 library(HH)
 ```
 
-Load Theme for plots
+Load Light Theme for plots.
 
 ```{r}
 theme_set(theme_light())
@@ -58,8 +63,8 @@ theme_update(axis.title = element_text()) #the default for fivethirtyeight is to
 theme_update(plot.title = element_text(hjust = 0.5)) # changing default to center all titles
 ```
 
-Load initial data sets provided
-
+Load initial source data and validation datasets.
+Look at Summary Statistics.
 ```{r}
 talent_raw = read.csv("https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2-data.csv", header = TRUE)
 talent_attrition_test = read.csv("https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2CompSet%20No%20Attrition.csv", header = TRUE)
@@ -75,7 +80,7 @@ glimpse(talent_raw)
 summary(talent_raw)
 ```
 
-Convert character to factors, drop columns with no variance
+Convert characters to factors, drop columns with no variance
 ```{r}
 talent_factor <- talent_raw %>%
   mutate_if(is.character, as.factor) %>%
@@ -93,7 +98,7 @@ md.pattern(talent_factor)
 glimpse(talent_factor)
 summary(talent_factor)
 ```
-Summary Statistics on additional Data Frames
+Summary Statistics on additional Data Frames for validation datasets.
 
 ```{r}
 #Summary Statistics and Glimpse into DataTypes and first observations for Test sets
@@ -101,7 +106,8 @@ summary(talent_attrition_test)
 summary(talent_salary_test)
 
 ```
-Attrition Properties in Dataset
+Attrition Properties in source data.
+Dataset is fairly balanced.
 
 ```{r}
 prop.table(table(talent_factor$Attrition))
@@ -257,7 +263,8 @@ ggpairs(talent_income, aes(colour = Attrition))
 
 ```
 
-Scatterplots of additional data points
+Scatterplots of additional data points for review.
+Visually show employees who left made less, were younger, and had last time invested in the job and with the company.
 
 ```{r}
 # People who left salary left made less over time
@@ -371,8 +378,8 @@ ggscatter(
 ```
 
 Modeling our Analysis
-Global Values
-
+Global Values for seed and train and test data.
+Remove variables with high correlation.
 ```{r}
 #This will be the dataset we use to model our Attrition and Salary Prediction
 set.seed(453)
@@ -389,24 +396,73 @@ talent_factor_model_Test = talent_factor_model[-trainInd,]
 ```
 
 Attrition Classification - Linear Regression
-
 ```{r}
-#Linear Model = need more on this
+#Linear Model 
 talent_attrition_lm <- lm(Attrition ~., data=talent_factor_model_Train)
 talent_attrition_lm
 ```
 
 Naive Bayes
-
+Produces lower sensitivity. Accuracy and specificity are ok.
 ```{r}
 NB_model = naiveBayes(talent_factor_model_Train[,-1],as.factor(talent_factor_model_Train$Attrition),laplace = 1)
 table(predict(NB_model,talent_factor_model_Test[,-1]),as.factor(talent_factor_model_Test$Attrition))
 CM = confusionMatrix(table(predict(NB_model,talent_factor_model_Test[,-1]),as.factor(talent_factor_model_Test$Attrition)))
 
 CM
+
+
+draw_confusion_matrix <- function(cm,Class1,Class2) {
+
+  layout(matrix(c(1,1,2)))
+  par(mar=c(2,2,2,2))
+  plot(c(100, 345), c(300, 450), type = "n", xlab="", ylab="", xaxt='n', yaxt='n')
+  title('CONFUSION MATRIX', cex.main=2)
+
+  # create the matrix 
+  rect(150, 430, 240, 370, col='#3F97D0')
+  text(195, 435, Class1, cex=1.2)
+  rect(250, 430, 340, 370, col='#F7AD50')
+  text(295, 435, Class2, cex=1.2)
+  text(125, 370, 'Predicted', cex=1.3, srt=90, font=2)
+  text(245, 450, 'Actual', cex=1.3, font=2)
+  rect(150, 305, 240, 365, col='#F7AD50')
+  rect(250, 305, 340, 365, col='#3F97D0')
+  text(140, 400, Class1, cex=1.2, srt=90)
+  text(140, 335, Class2, cex=1.2, srt=90)
+
+  # add in the cm results 
+  res <- as.numeric(cm$table)
+  text(195, 400, res[1], cex=1.6, font=2, col='white')
+  text(195, 335, res[2], cex=1.6, font=2, col='white')
+  text(295, 400, res[3], cex=1.6, font=2, col='white')
+  text(295, 335, res[4], cex=1.6, font=2, col='white')
+  
+  # add in the specifics 
+  plot(c(100, 0), c(100, 0), type = "n", xlab="", ylab="", main = "DETAILS", xaxt='n', yaxt='n')
+  text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
+  text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
+  text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
+  text(30, 70, round(as.numeric(cm$byClass[2]), 3), cex=1.2)
+  text(50, 85, names(cm$byClass[5]), cex=1.2, font=2)
+  text(50, 70, round(as.numeric(cm$byClass[5]), 3), cex=1.2)
+  text(70, 85, names(cm$byClass[6]), cex=1.2, font=2)
+  text(70, 70, round(as.numeric(cm$byClass[6]), 3), cex=1.2)
+  text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
+  text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
+
+  # add in the accuracy information 
+  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
+  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+}  
+
+draw_confusion_matrix(CM,"NO","YES")
 ```
 
-Random Forest
+Random Forest.
+Best model. 70% specificity and high accuracy and sensitivity.
 
 ```{r}
 RF_talent_factor_model_train <- train(Attrition ~., talent_factor_model_Train, method = 'rf', trControl = trainControl(method='repeatedcv'), importance = T)
@@ -417,11 +473,58 @@ cMatrixRF <- table(predTrain, talent_factor_model_Test$Attrition)
 plot(cMatrixRF, col="blue", ylab="Actual", xlab="Predicted", main='Random Forest Confusion Matrix')
 
 
+draw_confusion_matrix <- function(cm,Class1,Class2) {
+
+  layout(matrix(c(1,1,2)))
+  par(mar=c(2,2,2,2))
+  plot(c(100, 345), c(300, 450), type = "n", xlab="", ylab="", xaxt='n', yaxt='n')
+  title('CONFUSION MATRIX', cex.main=2)
+
+  # create the matrix 
+  rect(150, 430, 240, 370, col='#3F97D0')
+  text(195, 435, Class1, cex=1.2)
+  rect(250, 430, 340, 370, col='#F7AD50')
+  text(295, 435, Class2, cex=1.2)
+  text(125, 370, 'Predicted', cex=1.3, srt=90, font=2)
+  text(245, 450, 'Actual', cex=1.3, font=2)
+  rect(150, 305, 240, 365, col='#F7AD50')
+  rect(250, 305, 340, 365, col='#3F97D0')
+  text(140, 400, Class1, cex=1.2, srt=90)
+  text(140, 335, Class2, cex=1.2, srt=90)
+
+  # add in the cm results 
+  res <- as.numeric(cm$table)
+  text(195, 400, res[1], cex=1.6, font=2, col='white')
+  text(195, 335, res[2], cex=1.6, font=2, col='white')
+  text(295, 400, res[3], cex=1.6, font=2, col='white')
+  text(295, 335, res[4], cex=1.6, font=2, col='white')
+  
+  # add in the specifics 
+  plot(c(100, 0), c(100, 0), type = "n", xlab="", ylab="", main = "DETAILS", xaxt='n', yaxt='n')
+  text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
+  text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
+  text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
+  text(30, 70, round(as.numeric(cm$byClass[2]), 3), cex=1.2)
+  text(50, 85, names(cm$byClass[5]), cex=1.2, font=2)
+  text(50, 70, round(as.numeric(cm$byClass[5]), 3), cex=1.2)
+  text(70, 85, names(cm$byClass[6]), cex=1.2, font=2)
+  text(70, 70, round(as.numeric(cm$byClass[6]), 3), cex=1.2)
+  text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
+  text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
+
+  # add in the accuracy information 
+  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
+  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+}  
+
+draw_confusion_matrix(confusionMatrix(table(talent_factor_model_Test$Attrition, predTrain)),"NO","YES")
 
 ```
 
 SVM Model
-
+Overfitting model.
 ```{r}
 
 
@@ -431,9 +534,61 @@ confusionMatrix(table(talent_factor_model_Test$Attrition, predTrainsvm))
 cMatrixsvm <- table(predTrainsvm, talent_factor_model_Test$Attrition)
 plot(cMatrixsvm, col="blue", ylab="Actual", xlab="Predicted", main='Support Vector Machine Confusion Matrix')
 
+
+
+draw_confusion_matrix <- function(cm,Class1,Class2) {
+
+  layout(matrix(c(1,1,2)))
+  par(mar=c(2,2,2,2))
+  plot(c(100, 345), c(300, 450), type = "n", xlab="", ylab="", xaxt='n', yaxt='n')
+  title('CONFUSION MATRIX', cex.main=2)
+
+  # create the matrix 
+  rect(150, 430, 240, 370, col='#3F97D0')
+  text(195, 435, Class1, cex=1.2)
+  rect(250, 430, 340, 370, col='#F7AD50')
+  text(295, 435, Class2, cex=1.2)
+  text(125, 370, 'Predicted', cex=1.3, srt=90, font=2)
+  text(245, 450, 'Actual', cex=1.3, font=2)
+  rect(150, 305, 240, 365, col='#F7AD50')
+  rect(250, 305, 340, 365, col='#3F97D0')
+  text(140, 400, Class1, cex=1.2, srt=90)
+  text(140, 335, Class2, cex=1.2, srt=90)
+
+  # add in the cm results 
+  res <- as.numeric(cm$table)
+  text(195, 400, res[1], cex=1.6, font=2, col='white')
+  text(195, 335, res[2], cex=1.6, font=2, col='white')
+  text(295, 400, res[3], cex=1.6, font=2, col='white')
+  text(295, 335, res[4], cex=1.6, font=2, col='white')
+  
+  # add in the specifics 
+  plot(c(100, 0), c(100, 0), type = "n", xlab="", ylab="", main = "DETAILS", xaxt='n', yaxt='n')
+  text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
+  text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
+  text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
+  text(30, 70, round(as.numeric(cm$byClass[2]), 3), cex=1.2)
+  text(50, 85, names(cm$byClass[5]), cex=1.2, font=2)
+  text(50, 70, round(as.numeric(cm$byClass[5]), 3), cex=1.2)
+  text(70, 85, names(cm$byClass[6]), cex=1.2, font=2)
+  text(70, 70, round(as.numeric(cm$byClass[6]), 3), cex=1.2)
+  text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
+  text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
+
+  # add in the accuracy information 
+  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
+  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+}  
+
+draw_confusion_matrix(confusionMatrix(table(talent_factor_model_Test$Attrition, predTrainsvm)),"NO","YES")
+
+
 ```
 
-Feature Engineering for importance variable related to attrition
+Feature Engineering for importance variable related to attrition.
+Show top 3 factors of influence.
 ```{r}
 ### Feature Importance for Predictive ability
 # ensure results are repeatable
@@ -478,7 +633,7 @@ axis(side = 1,las=2,labels = names(Labels),
 ```
 
 Salary Prediction
-
+Remove variables with high VIF.
 ```{r}
 salaryfitincome <- lm(MonthlyIncome ~ ., data = talent_factor_model_Train)
 summary(salaryfitincome)
@@ -517,6 +672,7 @@ vif(salary_predict_lm)
 ```
 
 Salary Prediction - KNN
+RMSE of $1950. K=5.
 ```{r}
 #Our Lowest RMSE came with a K nearest neighbors of 7. 
 #This prediction model gives us an RMSE of $2,067 on monthly income, which falls below our $3,000 evaluation criteria.
@@ -530,7 +686,7 @@ predregtrainknn <- predict(knn_fit, talent_factor_model_salary_Test)
 ```
 
 Salary Prediction - Random Forest
-
+$1050 for RMSE. 22 predictors.
 ```{r}
 
 # Our optimal value for RMSE is $1037. However, we may be oveerfitting.
@@ -546,6 +702,7 @@ predregtrainrf <- predict(rf_fit, talent_factor_model_salary_Test)
 
 
 Salary Prediction - SVM 
+$1300 for RMSE
 ```{r}
 ### SVM METHOD RMSE IS 1366 and Rsquared is .91
 
@@ -558,7 +715,6 @@ predregtrainsvm <- predict(svm_fit, talent_factor_model_salary_Test)
 ```
 
 Feature Engineering for importance variable related to salary
-
 ```{r}
 ### Variable importance of our regressor
 rfimportreg <- varImp(rf_fit, scale = FALSE)
@@ -582,8 +738,9 @@ talent_attrition_merge <- cbind(talent_attrition_test$ID, talent_attrition_predi
 talent_attrition_class <- as.data.frame(talent_attrition_merge)
 talent_attrition_class$Attrition <- with(talent_attrition_class, ifelse(talent_attrition_predict == 1, "No", "Yes"))
 talent_attrition_final <- talent_attrition_class[,!(names(talent_attrition_class) %in% c("talent_attrition_predict"))]
+rename(talent_attrition_final, c("ID"="V1", "Attrition"="Attrition"))
 #outputting data
-write.csv(talent_attrition_final,"JasonHerbaugh_DDSCaseStudy2_PredictAttrition.csv",row.names = FALSE)
+write.csv(talent_attrition_final,"Case2Predictions_Herbaugh Attrition.csv",row.names = FALSE)
 
 ```
 
@@ -597,8 +754,24 @@ talent_salary_merge <- cbind(talent_salary_test$ID, talent_salary_regression)
 talent_salary_pred <- as.data.frame(talent_salary_merge)
 names(talent_salary_pred)<- c("ID", "MonthlySalary")
 #outputting data
-write.csv(talent_salary_pred,"JasonHerbaugh_DDSCaseStudy2_PredictSalary.csv",row.names = FALSE)
+write.csv(talent_salary_pred,"Case2Predictions_Herbaugh Salary.csv",row.names = FALSE)
 ```
+
+
+Youtube and Presentation link 
+https://www.youtube.com/watch?v=pkeAmR0H_j8
+
+Presentation
+https://github.com/jherbaugh/CaseStudy2DDS/blob/main/DDS%20Analytics%20Presentation.pptx
+```{r}
+#Powerpoint Presentation
+
+
+#Youtube Link
+#https://www.youtube.com/watch?v=pkeAmR0H_j8
+```
+
+
 
 
 Session Information

@@ -196,7 +196,10 @@ summary {
 </div>
 
 
-<p>For this case study we assume that our audience is the CEO and CFO of Budweiser (our client). They have hired us to answer 7 questions and beyond those general questions we will speculate / anticipate what may be of interest to them.</p>
+<p>Executive Summary</p>
+<p>DDSAnalytics is an analytics company specializing in talent management solutions for Fortune 100 companies. To gain a competitive edge over the competition they want to use data science for talent management. They want to investigate employee turnover to identify factors that contribute to attrition.</p>
+<p>Project Overview</p>
+<p>My EDA will consists of running summary statistics against the data provided. Inspecting the correlation matrix I will see what variables are multicollinear. In addition to the Boruta Feature selection,I will remove some unimportant variables from the dataset. Additionally, I will also plot interesting relationships between the variables. Finally, i will run through a multitude of models for both attrition classification and salary regression and output the results to the validation set.</p>
 <pre class="r"><code>options(scipen=999) #prevent scientific notation
 #Load Libraries needed for analysis
 library(dplyr)</code></pre>
@@ -369,11 +372,11 @@ library(MASS)</code></pre>
 <pre><code>## The following object is masked from &#39;package:purrr&#39;:
 ## 
 ##     transpose</code></pre>
-<p>Load Theme for plots</p>
+<p>Load Light Theme for plots.</p>
 <pre class="r"><code>theme_set(theme_light())
 theme_update(axis.title = element_text()) #the default for fivethirtyeight is to not show axis labels, this removes that default so we can choose to specify and display axis titles
 theme_update(plot.title = element_text(hjust = 0.5)) # changing default to center all titles</code></pre>
-<p>Load initial data sets provided</p>
+<p>Load initial source data and validation datasets. Look at Summary Statistics.</p>
 <pre class="r"><code>talent_raw = read.csv(&quot;https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2-data.csv&quot;, header = TRUE)
 talent_attrition_test = read.csv(&quot;https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2CompSet%20No%20Attrition.csv&quot;, header = TRUE)
 talent_salary_test = read.csv(&quot;https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2CompSet%20No%20Salary.csv&quot;, header = TRUE)
@@ -493,7 +496,7 @@ glimpse(talent_raw)</code></pre>
 ##  Mean   : 4.14       
 ##  3rd Qu.: 7.00       
 ##  Max.   :17.00</code></pre>
-<p>Convert character to factors, drop columns with no variance</p>
+<p>Convert characters to factors, drop columns with no variance</p>
 <pre class="r"><code>talent_factor &lt;- talent_raw %&gt;%
   mutate_if(is.character, as.factor) %&gt;%
   dplyr::select(Attrition, everything(), -Over18, -EmployeeCount, -StandardHours)</code></pre>
@@ -638,7 +641,7 @@ glimpse(talent_factor)</code></pre>
 ##  3rd Qu.: 3.000          3rd Qu.: 7.00       
 ##  Max.   :15.000          Max.   :17.00       
 ## </code></pre>
-<p>Summary Statistics on additional Data Frames</p>
+<p>Summary Statistics on additional Data Frames for validation datasets.</p>
 <pre class="r"><code>#Summary Statistics and Glimpse into DataTypes and first observations for Test sets
 summary(talent_attrition_test)</code></pre>
 <pre><code>##        ID            Age        BusinessTravel       DailyRate     
@@ -768,7 +771,7 @@ summary(talent_attrition_test)</code></pre>
 ##  Mean   : 4.2       Mean   : 2.14           Mean   : 3.817      
 ##  3rd Qu.: 7.0       3rd Qu.: 3.00           3rd Qu.: 7.000      
 ##  Max.   :16.0       Max.   :15.00           Max.   :15.000</code></pre>
-<p>Attrition Properties in Dataset</p>
+<p>Attrition Properties in source data. Dataset is fairly balanced.</p>
 <pre class="r"><code>prop.table(table(talent_factor$Attrition))</code></pre>
 <pre><code>## 
 ##        No       Yes 
@@ -937,7 +940,7 @@ ggpairs(talent_income, aes(colour = Attrition))</code></pre>
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <p><img src="EDA_Final_files/figure-html/unnamed-chunk-11-4.png" width="672" /></p>
-<p>Scatterplots of additional data points</p>
+<p>Scatterplots of additional data points for review. Visually show employees who left made less, were younger, and had last time invested in the job and with the company.</p>
 <pre class="r"><code># People who left salary left made less over time
 ggscatter(
   talent_factor, x = &quot;TotalWorkingYears&quot;, y = &quot;MonthlyIncome&quot;,
@@ -1048,7 +1051,7 @@ ggscatter(
   stat_regline_equation()</code></pre>
 <pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
 <p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-10.png" width="672" /></p>
-<p>Modeling our Analysis Global Values</p>
+<p>Modeling our Analysis Global Values for seed and train and test data. Remove variables with high correlation.</p>
 <pre class="r"><code>#This will be the dataset we use to model our Attrition and Salary Prediction
 set.seed(453)
 
@@ -1062,7 +1065,7 @@ trainInd &lt;- sample(1:dim(talent_factor_model)[1],round(splitPerc * dim(talent
 talent_factor_model_Train = talent_factor_model[trainInd,]
 talent_factor_model_Test = talent_factor_model[-trainInd,]</code></pre>
 <p>Attrition Classification - Linear Regression</p>
-<pre class="r"><code>#Linear Model = need more on this
+<pre class="r"><code>#Linear Model 
 talent_attrition_lm &lt;- lm(Attrition ~., data=talent_factor_model_Train)</code></pre>
 <pre><code>## Warning in model.response(mf, &quot;numeric&quot;): using type = &quot;numeric&quot; with a factor
 ## response will be ignored</code></pre>
@@ -1125,7 +1128,7 @@ talent_attrition_lm &lt;- lm(Attrition ~., data=talent_factor_model_Train)</code
 ##                       -0.033624586                        -0.099636221  
 ## DistanceGroupingLess than 6  Miles  
 ##                       -0.122468431</code></pre>
-<p>Naive Bayes</p>
+<p>Naive Bayes Produces lower sensitivity. Accuracy and specificity are ok.</p>
 <pre class="r"><code>NB_model = naiveBayes(talent_factor_model_Train[,-1],as.factor(talent_factor_model_Train$Attrition),laplace = 1)
 table(predict(NB_model,talent_factor_model_Test[,-1]),as.factor(talent_factor_model_Test$Attrition))</code></pre>
 <pre><code>##      
@@ -1162,7 +1165,55 @@ CM</code></pre>
 ##                                           
 ##        &#39;Positive&#39; Class : No              
 ## </code></pre>
-<p>Random Forest</p>
+<pre class="r"><code>draw_confusion_matrix &lt;- function(cm,Class1,Class2) {
+
+  layout(matrix(c(1,1,2)))
+  par(mar=c(2,2,2,2))
+  plot(c(100, 345), c(300, 450), type = &quot;n&quot;, xlab=&quot;&quot;, ylab=&quot;&quot;, xaxt=&#39;n&#39;, yaxt=&#39;n&#39;)
+  title(&#39;CONFUSION MATRIX&#39;, cex.main=2)
+
+  # create the matrix 
+  rect(150, 430, 240, 370, col=&#39;#3F97D0&#39;)
+  text(195, 435, Class1, cex=1.2)
+  rect(250, 430, 340, 370, col=&#39;#F7AD50&#39;)
+  text(295, 435, Class2, cex=1.2)
+  text(125, 370, &#39;Predicted&#39;, cex=1.3, srt=90, font=2)
+  text(245, 450, &#39;Actual&#39;, cex=1.3, font=2)
+  rect(150, 305, 240, 365, col=&#39;#F7AD50&#39;)
+  rect(250, 305, 340, 365, col=&#39;#3F97D0&#39;)
+  text(140, 400, Class1, cex=1.2, srt=90)
+  text(140, 335, Class2, cex=1.2, srt=90)
+
+  # add in the cm results 
+  res &lt;- as.numeric(cm$table)
+  text(195, 400, res[1], cex=1.6, font=2, col=&#39;white&#39;)
+  text(195, 335, res[2], cex=1.6, font=2, col=&#39;white&#39;)
+  text(295, 400, res[3], cex=1.6, font=2, col=&#39;white&#39;)
+  text(295, 335, res[4], cex=1.6, font=2, col=&#39;white&#39;)
+  
+  # add in the specifics 
+  plot(c(100, 0), c(100, 0), type = &quot;n&quot;, xlab=&quot;&quot;, ylab=&quot;&quot;, main = &quot;DETAILS&quot;, xaxt=&#39;n&#39;, yaxt=&#39;n&#39;)
+  text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
+  text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
+  text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
+  text(30, 70, round(as.numeric(cm$byClass[2]), 3), cex=1.2)
+  text(50, 85, names(cm$byClass[5]), cex=1.2, font=2)
+  text(50, 70, round(as.numeric(cm$byClass[5]), 3), cex=1.2)
+  text(70, 85, names(cm$byClass[6]), cex=1.2, font=2)
+  text(70, 70, round(as.numeric(cm$byClass[6]), 3), cex=1.2)
+  text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
+  text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
+
+  # add in the accuracy information 
+  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
+  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+}  
+
+draw_confusion_matrix(CM,&quot;NO&quot;,&quot;YES&quot;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>Random Forest. Best model. 70% specificity and high accuracy and sensitivity.</p>
 <pre class="r"><code>RF_talent_factor_model_train &lt;- train(Attrition ~., talent_factor_model_Train, method = &#39;rf&#39;, trControl = trainControl(method=&#39;repeatedcv&#39;), importance = T)
 
 predTrain &lt;- predict(RF_talent_factor_model_train, talent_factor_model_Test)
@@ -1197,7 +1248,55 @@ confusionMatrix(table(talent_factor_model_Test$Attrition, predTrain))</code></pr
 <pre class="r"><code>cMatrixRF &lt;- table(predTrain, talent_factor_model_Test$Attrition)
 plot(cMatrixRF, col=&quot;blue&quot;, ylab=&quot;Actual&quot;, xlab=&quot;Predicted&quot;, main=&#39;Random Forest Confusion Matrix&#39;)</code></pre>
 <p><img src="EDA_Final_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
-<p>SVM Model</p>
+<pre class="r"><code>draw_confusion_matrix &lt;- function(cm,Class1,Class2) {
+
+  layout(matrix(c(1,1,2)))
+  par(mar=c(2,2,2,2))
+  plot(c(100, 345), c(300, 450), type = &quot;n&quot;, xlab=&quot;&quot;, ylab=&quot;&quot;, xaxt=&#39;n&#39;, yaxt=&#39;n&#39;)
+  title(&#39;CONFUSION MATRIX&#39;, cex.main=2)
+
+  # create the matrix 
+  rect(150, 430, 240, 370, col=&#39;#3F97D0&#39;)
+  text(195, 435, Class1, cex=1.2)
+  rect(250, 430, 340, 370, col=&#39;#F7AD50&#39;)
+  text(295, 435, Class2, cex=1.2)
+  text(125, 370, &#39;Predicted&#39;, cex=1.3, srt=90, font=2)
+  text(245, 450, &#39;Actual&#39;, cex=1.3, font=2)
+  rect(150, 305, 240, 365, col=&#39;#F7AD50&#39;)
+  rect(250, 305, 340, 365, col=&#39;#3F97D0&#39;)
+  text(140, 400, Class1, cex=1.2, srt=90)
+  text(140, 335, Class2, cex=1.2, srt=90)
+
+  # add in the cm results 
+  res &lt;- as.numeric(cm$table)
+  text(195, 400, res[1], cex=1.6, font=2, col=&#39;white&#39;)
+  text(195, 335, res[2], cex=1.6, font=2, col=&#39;white&#39;)
+  text(295, 400, res[3], cex=1.6, font=2, col=&#39;white&#39;)
+  text(295, 335, res[4], cex=1.6, font=2, col=&#39;white&#39;)
+  
+  # add in the specifics 
+  plot(c(100, 0), c(100, 0), type = &quot;n&quot;, xlab=&quot;&quot;, ylab=&quot;&quot;, main = &quot;DETAILS&quot;, xaxt=&#39;n&#39;, yaxt=&#39;n&#39;)
+  text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
+  text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
+  text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
+  text(30, 70, round(as.numeric(cm$byClass[2]), 3), cex=1.2)
+  text(50, 85, names(cm$byClass[5]), cex=1.2, font=2)
+  text(50, 70, round(as.numeric(cm$byClass[5]), 3), cex=1.2)
+  text(70, 85, names(cm$byClass[6]), cex=1.2, font=2)
+  text(70, 70, round(as.numeric(cm$byClass[6]), 3), cex=1.2)
+  text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
+  text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
+
+  # add in the accuracy information 
+  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
+  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+}  
+
+draw_confusion_matrix(confusionMatrix(table(talent_factor_model_Test$Attrition, predTrain)),&quot;NO&quot;,&quot;YES&quot;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-16-2.png" width="672" /></p>
+<p>SVM Model Overfitting model.</p>
 <pre class="r"><code>svm_talent_factor_model_train &lt;- train(Attrition ~., talent_factor_model_Train, method = &#39;svmRadial&#39;, trControl = trainControl(method=&#39;repeatedcv&#39;), importance=T)
 predTrainsvm &lt;- predict(svm_talent_factor_model_train, talent_factor_model_Test)
 confusionMatrix(table(talent_factor_model_Test$Attrition, predTrainsvm))</code></pre>
@@ -1231,7 +1330,55 @@ confusionMatrix(table(talent_factor_model_Test$Attrition, predTrainsvm))</code><
 <pre class="r"><code>cMatrixsvm &lt;- table(predTrainsvm, talent_factor_model_Test$Attrition)
 plot(cMatrixsvm, col=&quot;blue&quot;, ylab=&quot;Actual&quot;, xlab=&quot;Predicted&quot;, main=&#39;Support Vector Machine Confusion Matrix&#39;)</code></pre>
 <p><img src="EDA_Final_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
-<p>Feature Engineering for importance variable related to attrition</p>
+<pre class="r"><code>draw_confusion_matrix &lt;- function(cm,Class1,Class2) {
+
+  layout(matrix(c(1,1,2)))
+  par(mar=c(2,2,2,2))
+  plot(c(100, 345), c(300, 450), type = &quot;n&quot;, xlab=&quot;&quot;, ylab=&quot;&quot;, xaxt=&#39;n&#39;, yaxt=&#39;n&#39;)
+  title(&#39;CONFUSION MATRIX&#39;, cex.main=2)
+
+  # create the matrix 
+  rect(150, 430, 240, 370, col=&#39;#3F97D0&#39;)
+  text(195, 435, Class1, cex=1.2)
+  rect(250, 430, 340, 370, col=&#39;#F7AD50&#39;)
+  text(295, 435, Class2, cex=1.2)
+  text(125, 370, &#39;Predicted&#39;, cex=1.3, srt=90, font=2)
+  text(245, 450, &#39;Actual&#39;, cex=1.3, font=2)
+  rect(150, 305, 240, 365, col=&#39;#F7AD50&#39;)
+  rect(250, 305, 340, 365, col=&#39;#3F97D0&#39;)
+  text(140, 400, Class1, cex=1.2, srt=90)
+  text(140, 335, Class2, cex=1.2, srt=90)
+
+  # add in the cm results 
+  res &lt;- as.numeric(cm$table)
+  text(195, 400, res[1], cex=1.6, font=2, col=&#39;white&#39;)
+  text(195, 335, res[2], cex=1.6, font=2, col=&#39;white&#39;)
+  text(295, 400, res[3], cex=1.6, font=2, col=&#39;white&#39;)
+  text(295, 335, res[4], cex=1.6, font=2, col=&#39;white&#39;)
+  
+  # add in the specifics 
+  plot(c(100, 0), c(100, 0), type = &quot;n&quot;, xlab=&quot;&quot;, ylab=&quot;&quot;, main = &quot;DETAILS&quot;, xaxt=&#39;n&#39;, yaxt=&#39;n&#39;)
+  text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
+  text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
+  text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
+  text(30, 70, round(as.numeric(cm$byClass[2]), 3), cex=1.2)
+  text(50, 85, names(cm$byClass[5]), cex=1.2, font=2)
+  text(50, 70, round(as.numeric(cm$byClass[5]), 3), cex=1.2)
+  text(70, 85, names(cm$byClass[6]), cex=1.2, font=2)
+  text(70, 70, round(as.numeric(cm$byClass[6]), 3), cex=1.2)
+  text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
+  text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
+
+  # add in the accuracy information 
+  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
+  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+}  
+
+draw_confusion_matrix(confusionMatrix(table(talent_factor_model_Test$Attrition, predTrainsvm)),&quot;NO&quot;,&quot;YES&quot;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-17-2.png" width="672" /></p>
+<p>Feature Engineering for importance variable related to attrition. Show top 3 factors of influence.</p>
 <pre class="r"><code>### Feature Importance for Predictive ability
 # ensure results are repeatable
 # load the library
@@ -1318,7 +1465,7 @@ boruta.talent_train &lt;- Boruta(Attrition~., data = talent_factor, doTrace = 2)
 <pre><code>##  10. run of importance source...</code></pre>
 <pre><code>##  11. run of importance source...</code></pre>
 <pre><code>##  12. run of importance source...</code></pre>
-<pre><code>## After 12 iterations, +1.4 secs:</code></pre>
+<pre><code>## After 12 iterations, +1.6 secs:</code></pre>
 <pre><code>##  confirmed 8 attributes: Age, JobInvolvement, MaritalStatus, MonthlyIncome, OverTime and 3 more;</code></pre>
 <pre><code>##  rejected 14 attributes: BusinessTravel, DailyRate, DistanceGrouping, Education, EducationField and 9 more;</code></pre>
 <pre><code>##  still have 12 attributes left.</code></pre>
@@ -1326,14 +1473,14 @@ boruta.talent_train &lt;- Boruta(Attrition~., data = talent_factor, doTrace = 2)
 <pre><code>##  14. run of importance source...</code></pre>
 <pre><code>##  15. run of importance source...</code></pre>
 <pre><code>##  16. run of importance source...</code></pre>
-<pre><code>## After 16 iterations, +1.8 secs:</code></pre>
+<pre><code>## After 16 iterations, +1.9 secs:</code></pre>
 <pre><code>##  confirmed 4 attributes: agegroup, JobLevel, JobRole, YearsWithCurrManager;</code></pre>
 <pre><code>##  still have 8 attributes left.</code></pre>
 <pre><code>##  17. run of importance source...</code></pre>
 <pre><code>##  18. run of importance source...</code></pre>
 <pre><code>##  19. run of importance source...</code></pre>
 <pre><code>##  20. run of importance source...</code></pre>
-<pre><code>## After 20 iterations, +2.1 secs:</code></pre>
+<pre><code>## After 20 iterations, +2.3 secs:</code></pre>
 <pre><code>##  rejected 1 attribute: DistanceFromHome;</code></pre>
 <pre><code>##  still have 7 attributes left.</code></pre>
 <pre><code>##  21. run of importance source...</code></pre>
@@ -1360,7 +1507,7 @@ boruta.talent_train &lt;- Boruta(Attrition~., data = talent_factor, doTrace = 2)
 <pre><code>##  42. run of importance source...</code></pre>
 <pre><code>##  43. run of importance source...</code></pre>
 <pre><code>##  44. run of importance source...</code></pre>
-<pre><code>## After 44 iterations, +4 secs:</code></pre>
+<pre><code>## After 44 iterations, +4.2 secs:</code></pre>
 <pre><code>##  confirmed 1 attribute: WorkLifeBalance;</code></pre>
 <pre><code>##  still have 6 attributes left.</code></pre>
 <pre><code>##  45. run of importance source...</code></pre>
@@ -1378,13 +1525,13 @@ boruta.talent_train &lt;- Boruta(Attrition~., data = talent_factor, doTrace = 2)
 <pre><code>##  57. run of importance source...</code></pre>
 <pre><code>##  58. run of importance source...</code></pre>
 <pre><code>##  59. run of importance source...</code></pre>
-<pre><code>## After 59 iterations, +5.1 secs:</code></pre>
+<pre><code>## After 59 iterations, +5.4 secs:</code></pre>
 <pre><code>##  confirmed 1 attribute: YearsInCurrentRole;</code></pre>
 <pre><code>##  still have 5 attributes left.</code></pre>
 <pre><code>##  60. run of importance source...</code></pre>
 <pre><code>##  61. run of importance source...</code></pre>
 <pre><code>##  62. run of importance source...</code></pre>
-<pre><code>## After 62 iterations, +5.4 secs:</code></pre>
+<pre><code>## After 62 iterations, +5.6 secs:</code></pre>
 <pre><code>##  confirmed 1 attribute: NumCompaniesWorked;</code></pre>
 <pre><code>##  still have 4 attributes left.</code></pre>
 <pre><code>##  63. run of importance source...</code></pre>
@@ -1410,7 +1557,7 @@ boruta.talent_train &lt;- Boruta(Attrition~., data = talent_factor, doTrace = 2)
 <pre><code>##  83. run of importance source...</code></pre>
 <pre><code>##  84. run of importance source...</code></pre>
 <pre><code>##  85. run of importance source...</code></pre>
-<pre><code>## After 85 iterations, +7.1 secs:</code></pre>
+<pre><code>## After 85 iterations, +7.5 secs:</code></pre>
 <pre><code>##  rejected 1 attribute: EnvironmentSatisfaction;</code></pre>
 <pre><code>##  still have 3 attributes left.</code></pre>
 <pre><code>##  86. run of importance source...</code></pre>
@@ -1428,7 +1575,7 @@ boruta.talent_train &lt;- Boruta(Attrition~., data = talent_factor, doTrace = 2)
 <pre><code>##  98. run of importance source...</code></pre>
 <pre><code>##  99. run of importance source...</code></pre>
 <pre class="r"><code>print(boruta.talent_train)</code></pre>
-<pre><code>## Boruta performed 99 iterations in 8.355957 secs.
+<pre><code>## Boruta performed 99 iterations in 8.587504 secs.
 ##  15 attributes confirmed important: Age, agegroup, JobInvolvement,
 ## JobLevel, JobRole and 10 more;
 ##  16 attributes confirmed unimportant: BusinessTravel, DailyRate,
@@ -1438,7 +1585,7 @@ boruta.talent_train &lt;- Boruta(Attrition~., data = talent_factor, doTrace = 2)
 <pre class="r"><code>#take a call on tentative features
 boruta.talent &lt;- TentativeRoughFix(boruta.talent_train)
 print(boruta.talent)</code></pre>
-<pre><code>## Boruta performed 99 iterations in 8.355957 secs.
+<pre><code>## Boruta performed 99 iterations in 8.587504 secs.
 ## Tentatives roughfixed over the last 99 iterations.
 ##  17 attributes confirmed important: Age, agegroup, Department,
 ## JobInvolvement, JobLevel and 12 more;
@@ -1458,7 +1605,7 @@ Labels &lt;- sort(sapply(lz,median))
 axis(side = 1,las=2,labels = names(Labels),
      at = 1:ncol(boruta.talent$ImpHistory), cex.axis = 0.7)</code></pre>
 <p><img src="EDA_Final_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
-<p>Salary Prediction</p>
+<p>Salary Prediction Remove variables with high VIF.</p>
 <pre class="r"><code>salaryfitincome &lt;- lm(MonthlyIncome ~ ., data = talent_factor_model_Train)
 summary(salaryfitincome)</code></pre>
 <pre><code>## 
@@ -1820,7 +1967,7 @@ summary(salary_predict_lm)</code></pre>
 ##                           1.963982                           1.443824 
 ##       DistanceGrouping6 - 10 Miles DistanceGroupingLess than 6  Miles 
 ##                           2.420304                           2.697315</code></pre>
-<p>Salary Prediction - KNN</p>
+<p>Salary Prediction - KNN RMSE of $1950. K=5.</p>
 <pre class="r"><code>#Our Lowest RMSE came with a K nearest neighbors of 7. 
 #This prediction model gives us an RMSE of $2,067 on monthly income, which falls below our $3,000 evaluation criteria.
 traind &lt;- trainControl(method = &#39;repeatedcv&#39;, number = 10, repeats = 3)
@@ -1853,7 +2000,7 @@ knn_fit</code></pre>
 <pre class="r"><code>plot(knn_fit)</code></pre>
 <p><img src="EDA_Final_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 <pre class="r"><code>predregtrainknn &lt;- predict(knn_fit, talent_factor_model_salary_Test)</code></pre>
-<p>Salary Prediction - Random Forest</p>
+<p>Salary Prediction - Random Forest $1050 for RMSE. 22 predictors.</p>
 <pre class="r"><code># Our optimal value for RMSE is $1037. However, we may be oveerfitting.
 
 rf_fit &lt;- train(MonthlyIncome ~ ., data = talent_factor_model_salary_Train, method = &#39;rf&#39;, trControl = traind, preProcess = c(&#39;center&#39;, &#39;scale&#39;), tuneLength = 10, importance=T)
@@ -1885,7 +2032,7 @@ rf_fit</code></pre>
 <pre class="r"><code>plot(rf_fit)</code></pre>
 <p><img src="EDA_Final_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
 <pre class="r"><code>predregtrainrf &lt;- predict(rf_fit, talent_factor_model_salary_Test)</code></pre>
-<p>Salary Prediction - SVM</p>
+<p>Salary Prediction - SVM $1300 for RMSE</p>
 <pre class="r"><code>### SVM METHOD RMSE IS 1366 and Rsquared is .91
 
 svm_fit &lt;- train(MonthlyIncome ~ ., data = talent_factor_model_salary_Train, method = &#39;svmRadial&#39;, trControl = traind, preProcess = c(&#39;center&#39;, &#39;scale&#39;), tuneLength = 10, importance=T)
@@ -1934,8 +2081,310 @@ talent_attrition_merge &lt;- cbind(talent_attrition_test$ID, talent_attrition_pr
 talent_attrition_class &lt;- as.data.frame(talent_attrition_merge)
 talent_attrition_class$Attrition &lt;- with(talent_attrition_class, ifelse(talent_attrition_predict == 1, &quot;No&quot;, &quot;Yes&quot;))
 talent_attrition_final &lt;- talent_attrition_class[,!(names(talent_attrition_class) %in% c(&quot;talent_attrition_predict&quot;))]
-#outputting data
-write.csv(talent_attrition_final,&quot;JasonHerbaugh_DDSCaseStudy2_PredictAttrition.csv&quot;,row.names = FALSE)</code></pre>
+rename(talent_attrition_final, c(&quot;ID&quot;=&quot;V1&quot;, &quot;Attrition&quot;=&quot;Attrition&quot;))</code></pre>
+<pre><code>##       ID Attrition
+## 1   1171        No
+## 2   1172        No
+## 3   1173        No
+## 4   1174        No
+## 5   1175        No
+## 6   1176        No
+## 7   1177        No
+## 8   1178        No
+## 9   1179        No
+## 10  1180        No
+## 11  1181        No
+## 12  1182        No
+## 13  1183        No
+## 14  1184        No
+## 15  1185        No
+## 16  1186        No
+## 17  1187        No
+## 18  1188        No
+## 19  1189        No
+## 20  1190        No
+## 21  1191        No
+## 22  1192        No
+## 23  1193        No
+## 24  1194        No
+## 25  1195        No
+## 26  1196        No
+## 27  1197        No
+## 28  1198        No
+## 29  1199        No
+## 30  1200        No
+## 31  1201        No
+## 32  1202        No
+## 33  1203        No
+## 34  1204        No
+## 35  1205       Yes
+## 36  1206        No
+## 37  1207        No
+## 38  1208        No
+## 39  1209        No
+## 40  1210        No
+## 41  1211        No
+## 42  1212        No
+## 43  1213        No
+## 44  1214        No
+## 45  1215        No
+## 46  1216        No
+## 47  1217        No
+## 48  1218        No
+## 49  1219        No
+## 50  1220        No
+## 51  1221        No
+## 52  1222        No
+## 53  1223        No
+## 54  1224        No
+## 55  1225        No
+## 56  1226        No
+## 57  1227        No
+## 58  1228        No
+## 59  1229        No
+## 60  1230        No
+## 61  1231        No
+## 62  1232        No
+## 63  1233       Yes
+## 64  1234        No
+## 65  1235        No
+## 66  1236        No
+## 67  1237        No
+## 68  1238        No
+## 69  1239        No
+## 70  1240       Yes
+## 71  1241        No
+## 72  1242        No
+## 73  1243        No
+## 74  1244        No
+## 75  1245        No
+## 76  1246        No
+## 77  1247        No
+## 78  1248        No
+## 79  1249        No
+## 80  1250        No
+## 81  1251        No
+## 82  1252        No
+## 83  1253        No
+## 84  1254        No
+## 85  1255        No
+## 86  1256        No
+## 87  1257        No
+## 88  1258        No
+## 89  1259        No
+## 90  1260        No
+## 91  1261        No
+## 92  1262        No
+## 93  1263        No
+## 94  1264        No
+## 95  1265        No
+## 96  1266        No
+## 97  1267        No
+## 98  1268        No
+## 99  1269        No
+## 100 1270       Yes
+## 101 1271        No
+## 102 1272        No
+## 103 1273        No
+## 104 1274        No
+## 105 1275        No
+## 106 1276        No
+## 107 1277        No
+## 108 1278        No
+## 109 1279       Yes
+## 110 1280        No
+## 111 1281        No
+## 112 1282        No
+## 113 1283        No
+## 114 1284        No
+## 115 1285        No
+## 116 1286        No
+## 117 1287        No
+## 118 1288        No
+## 119 1289        No
+## 120 1290        No
+## 121 1291        No
+## 122 1292        No
+## 123 1293        No
+## 124 1294        No
+## 125 1295        No
+## 126 1296        No
+## 127 1297        No
+## 128 1298       Yes
+## 129 1299        No
+## 130 1300        No
+## 131 1301        No
+## 132 1302        No
+## 133 1303        No
+## 134 1304        No
+## 135 1305        No
+## 136 1306        No
+## 137 1307        No
+## 138 1308        No
+## 139 1309       Yes
+## 140 1310        No
+## 141 1311        No
+## 142 1312        No
+## 143 1313        No
+## 144 1314        No
+## 145 1315        No
+## 146 1316        No
+## 147 1317        No
+## 148 1318       Yes
+## 149 1319        No
+## 150 1320        No
+## 151 1321        No
+## 152 1322        No
+## 153 1323        No
+## 154 1324        No
+## 155 1325       Yes
+## 156 1326        No
+## 157 1327        No
+## 158 1328        No
+## 159 1329       Yes
+## 160 1330        No
+## 161 1331        No
+## 162 1332        No
+## 163 1333        No
+## 164 1334        No
+## 165 1335        No
+## 166 1336        No
+## 167 1337        No
+## 168 1338        No
+## 169 1339        No
+## 170 1340        No
+## 171 1341        No
+## 172 1342        No
+## 173 1343        No
+## 174 1344        No
+## 175 1345        No
+## 176 1346        No
+## 177 1347        No
+## 178 1348        No
+## 179 1349        No
+## 180 1350        No
+## 181 1351       Yes
+## 182 1352        No
+## 183 1353        No
+## 184 1354        No
+## 185 1355        No
+## 186 1356        No
+## 187 1357        No
+## 188 1358        No
+## 189 1359        No
+## 190 1360        No
+## 191 1361        No
+## 192 1362        No
+## 193 1363        No
+## 194 1364        No
+## 195 1365        No
+## 196 1366        No
+## 197 1367        No
+## 198 1368        No
+## 199 1369        No
+## 200 1370        No
+## 201 1371        No
+## 202 1372        No
+## 203 1373        No
+## 204 1374        No
+## 205 1375        No
+## 206 1376        No
+## 207 1377        No
+## 208 1378        No
+## 209 1379        No
+## 210 1380        No
+## 211 1381        No
+## 212 1382        No
+## 213 1383        No
+## 214 1384        No
+## 215 1385        No
+## 216 1386        No
+## 217 1387        No
+## 218 1388        No
+## 219 1389        No
+## 220 1390        No
+## 221 1391        No
+## 222 1392        No
+## 223 1393        No
+## 224 1394       Yes
+## 225 1395        No
+## 226 1396        No
+## 227 1397        No
+## 228 1398        No
+## 229 1399        No
+## 230 1400        No
+## 231 1401       Yes
+## 232 1402        No
+## 233 1403        No
+## 234 1404        No
+## 235 1405        No
+## 236 1406        No
+## 237 1407        No
+## 238 1408        No
+## 239 1409        No
+## 240 1410        No
+## 241 1411        No
+## 242 1412        No
+## 243 1413        No
+## 244 1414        No
+## 245 1415        No
+## 246 1416        No
+## 247 1417        No
+## 248 1418        No
+## 249 1419        No
+## 250 1420        No
+## 251 1421       Yes
+## 252 1422        No
+## 253 1423        No
+## 254 1424        No
+## 255 1425        No
+## 256 1426        No
+## 257 1427        No
+## 258 1428        No
+## 259 1429        No
+## 260 1430        No
+## 261 1431        No
+## 262 1432        No
+## 263 1433        No
+## 264 1434        No
+## 265 1435        No
+## 266 1436        No
+## 267 1437        No
+## 268 1438        No
+## 269 1439        No
+## 270 1440        No
+## 271 1441        No
+## 272 1442       Yes
+## 273 1443        No
+## 274 1444       Yes
+## 275 1445       Yes
+## 276 1446        No
+## 277 1447        No
+## 278 1448        No
+## 279 1449        No
+## 280 1450        No
+## 281 1451        No
+## 282 1452        No
+## 283 1453        No
+## 284 1454        No
+## 285 1455        No
+## 286 1456        No
+## 287 1457        No
+## 288 1458       Yes
+## 289 1459        No
+## 290 1460        No
+## 291 1461        No
+## 292 1462        No
+## 293 1463        No
+## 294 1464        No
+## 295 1465        No
+## 296 1466        No
+## 297 1467        No
+## 298 1468        No
+## 299 1469        No
+## 300 1470        No</code></pre>
+<pre class="r"><code>#outputting data
+write.csv(talent_attrition_final,&quot;Case2Predictions_Herbaugh Attrition.csv&quot;,row.names = FALSE)</code></pre>
 <p>Run salary prediction on Test Data</p>
 <pre class="r"><code>#run prediction on rf classification model using our test set
 talent_salary_test$Attrition &lt;- with(talent_salary_test, ifelse(Attrition == 1, &quot;Yes&quot;, &quot;No&quot;))
@@ -1944,7 +2393,14 @@ talent_salary_merge &lt;- cbind(talent_salary_test$ID, talent_salary_regression)
 talent_salary_pred &lt;- as.data.frame(talent_salary_merge)
 names(talent_salary_pred)&lt;- c(&quot;ID&quot;, &quot;MonthlySalary&quot;)
 #outputting data
-write.csv(talent_salary_pred,&quot;JasonHerbaugh_DDSCaseStudy2_PredictSalary.csv&quot;,row.names = FALSE)</code></pre>
+write.csv(talent_salary_pred,&quot;Case2Predictions_Herbaugh Salary.csv&quot;,row.names = FALSE)</code></pre>
+<p>Youtube and Presentation link <a href="https://www.youtube.com/watch?v=pkeAmR0H_j8" class="uri">https://www.youtube.com/watch?v=pkeAmR0H_j8</a></p>
+<p>Presentation <a href="https://github.com/jherbaugh/CaseStudy2DDS/blob/main/DDS%20Analytics%20Presentation.pptx" class="uri">https://github.com/jherbaugh/CaseStudy2DDS/blob/main/DDS%20Analytics%20Presentation.pptx</a></p>
+<pre class="r"><code>#Powerpoint Presentation
+
+
+#Youtube Link
+#https://www.youtube.com/watch?v=pkeAmR0H_j8</code></pre>
 <p>Session Information</p>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.0.4 (2021-02-15)
