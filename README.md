@@ -24,15 +24,16 @@ The Client, "DDSAnalytics ," has hired me to conduct specific analysis to identi
 ## Data
 The Data Sets
 
-* ['Beers.csv'](https://github.com/rickfontenot/DS6306_Study1/blob/main/Beers.csv) - The US craft beers data set
+* ['CaseStudy2-data.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/main/CaseStudy2-data.csv) - Soure data for talent management.
 
-* ['Breweries.csv'](https://github.com/rickfontenot/DS6306_Study1/blob/main/Breweries.csv) -The US craft breweries data set
+* ['Case2PredictionsClassifyEXAMPLE.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2PredictionsClassifyEXAMPLE.csv) - Classification model example.
+* ['Case2PredictionsRegressEXAMPLE.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2PredictionsRegressEXAMPLE.csv) - Regression model example.
 
-* ['NIH_per_capita.csv'](https://github.com/rickfontenot/DS6306_Study1/blob/main/NIH_per_capita.csv) - * [Source](https://vinepair.com/articles/map-states-drink-beer-america-2020/) - Data from National Institute from Health regarding per capita alcohol consumption broken down by state
+* ['CaseStudy2CompSet No Attrition.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/CaseStudy2CompSet No Attrition.csv) - ValidationDataset with no attrition.
+* ['CaseStudy2CompSet No Salary.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/CaseStudy2CompSet No Salary.csv.csv) - ValidationDataset with no salary.
 
-* ['NIH_total_consumption.csv'](GithubURL)  * [Source](https://vinepair.com/articles/map-states-drink-beer-america-2020/) - Data from National Institute from Health regarding total alcohol consumption broken down by state
-
-* ['nst.est2019.csv'](https://github.com/rickfontenot/DS6306_Study1/blob/main/nst-est2019.csv) * [Source](https://www.census.gov/data/datasets/time-series/demo/popest/2010s-state-total.html) - Data from US Census estimations of state population 2019
+* ['Case2Predictions_Herbaugh Attrition.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2Predictions_Herbaugh Attrition.csv) - Output of my RF model for classification.
+* ['Case2Predictions_Herbaugh Salary.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2Predictions_Herbaugh Salary.csv) - Output of my RF model for regression.
 
 ## Analysis
 
