@@ -19,7 +19,7 @@ The Client, "DDSAnalytics ," has hired me to conduct specific analysis to identi
 
 ## Knit File in rendered html page
 
-* [Knitted presentation](https://github.com/jherbaugh/CaseStudy2DDS/EDA_Final.html)
+* [Knitted presentation](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/EDA_Final.html)
 
 ## Data
 The Data Sets
