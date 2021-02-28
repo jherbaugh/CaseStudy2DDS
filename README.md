@@ -10,7 +10,7 @@ created by * [Jason Herbaugh](https://github.com/jherbaugh)
 The Client, "DDSAnalytics ," has hired me to conduct specific analysis to identify factors that lead to attrition, provide any interesting trends in the data and build a model to predict attrition and salary (seperately).
 
 ## YouTube Video
-* [Jason's Youtube Video](https://www.youtube.com/watch?v=iQFv4YB6I3c) 
+* [Jason's Youtube Video](https://www.youtube.com/watch?v=pkeAmR0H_j8) 
 
 
 ## Presentations
