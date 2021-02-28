@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Jason Herbaugh" />
+
+
+<title>EDA Final</title>
+
+<script src="libs/header-attrs-2.5/header-attrs.js"></script>
+<script src="libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="libs/navigation-1.1/tabsets.js"></script>
+<link href="libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">EDA Final</h1>
+<h4 class="author">Jason Herbaugh</h4>
+<h4 class="date">2/27/2021</h4>
+
+</div>
+
+
+<p>For this case study we assume that our audience is the CEO and CFO of Budweiser (our client). They have hired us to answer 7 questions and beyond those general questions we will speculate / anticipate what may be of interest to them.</p>
+<pre class="r"><code>options(scipen=999) #prevent scientific notation
+#Load Libraries needed for analysis
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --</code></pre>
+<pre><code>## v ggplot2 3.3.2     v purrr   0.3.4
+## v tibble  3.0.4     v stringr 1.4.0
+## v tidyr   1.1.2     v forcats 0.5.0
+## v readr   1.4.0</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(visdat)
+library(GGally)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;GGally&#39;:
+##   method from   
+##   +.gg   ggplot2</code></pre>
+<pre class="r"><code>library(usmap)
+library(mice)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;mice&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     cbind, rbind</code></pre>
+<pre class="r"><code>library(VIM)</code></pre>
+<pre><code>## Loading required package: colorspace</code></pre>
+<pre><code>## Loading required package: grid</code></pre>
+<pre><code>## VIM is ready to use.</code></pre>
+<pre><code>## Suggestions and bug-reports can be submitted at: https://github.com/statistikat/VIM/issues</code></pre>
+<pre><code>## 
+## Attaching package: &#39;VIM&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:datasets&#39;:
+## 
+##     sleep</code></pre>
+<pre class="r"><code>library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code>library(ggpubr)
+library(caret)</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## 
+## Attaching package: &#39;caret&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     lift</code></pre>
+<pre class="r"><code>library(e1071)
+library(class)
+library(maps)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;maps&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     map</code></pre>
+<pre class="r"><code>library(mapproj)
+library(stringr)
+library(ggplot2)
+library(ggthemes)
+library(table1)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;table1&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     units, units&lt;-</code></pre>
+<pre class="r"><code>library(ggcorrplot)
+library(mlbench)
+library(Boruta)
+library(e1071)
+library(MASS)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;MASS&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:plotly&#39;:
+## 
+##     select</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     select</code></pre>
+<pre class="r"><code>library(naivebayes)</code></pre>
+<pre><code>## naivebayes 0.9.7 loaded</code></pre>
+<pre class="r"><code>library(mboost)</code></pre>
+<pre><code>## Loading required package: parallel</code></pre>
+<pre><code>## Loading required package: stabs</code></pre>
+<pre><code>## 
+## Attaching package: &#39;mboost&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%</code></pre>
+<pre class="r"><code>library(kernlab)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;kernlab&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     cross</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     alpha</code></pre>
+<pre class="r"><code>library(randomForest)</code></pre>
+<pre><code>## randomForest 4.6-14</code></pre>
+<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>## 
+## Attaching package: &#39;randomForest&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     margin</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre class="r"><code>library(doParallel)</code></pre>
+<pre><code>## Loading required package: foreach</code></pre>
+<pre><code>## 
+## Attaching package: &#39;foreach&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:purrr&#39;:
+## 
+##     accumulate, when</code></pre>
+<pre><code>## Loading required package: iterators</code></pre>
+<pre class="r"><code>library(HH)</code></pre>
+<pre><code>## Loading required package: latticeExtra</code></pre>
+<pre><code>## 
+## Attaching package: &#39;latticeExtra&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     layer</code></pre>
+<pre><code>## Loading required package: multcomp</code></pre>
+<pre><code>## Loading required package: mvtnorm</code></pre>
+<pre><code>## Loading required package: survival</code></pre>
+<pre><code>## 
+## Attaching package: &#39;survival&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:caret&#39;:
+## 
+##     cluster</code></pre>
+<pre><code>## Loading required package: TH.data</code></pre>
+<pre><code>## 
+## Attaching package: &#39;TH.data&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:MASS&#39;:
+## 
+##     geyser</code></pre>
+<pre><code>## Loading required package: gridExtra</code></pre>
+<pre><code>## 
+## Attaching package: &#39;gridExtra&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:randomForest&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## 
+## Attaching package: &#39;HH&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     transpose</code></pre>
+<p>Load Theme for plots</p>
+<pre class="r"><code>theme_set(theme_light())
+theme_update(axis.title = element_text()) #the default for fivethirtyeight is to not show axis labels, this removes that default so we can choose to specify and display axis titles
+theme_update(plot.title = element_text(hjust = 0.5)) # changing default to center all titles</code></pre>
+<p>Load initial data sets provided</p>
+<pre class="r"><code>talent_raw = read.csv(&quot;https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2-data.csv&quot;, header = TRUE)
+talent_attrition_test = read.csv(&quot;https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2CompSet%20No%20Attrition.csv&quot;, header = TRUE)
+talent_salary_test = read.csv(&quot;https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2CompSet%20No%20Salary.csv&quot;, header = TRUE)
+
+
+#Read in Dimension of the Dataset
+dim(talent_raw) #870 observations x 36 columns</code></pre>
+<pre><code>## [1] 870  36</code></pre>
+<pre class="r"><code>#Summary Statistics and Glimpse into DataTypes and first observations
+glimpse(talent_raw)</code></pre>
+<pre><code>## Rows: 870
+## Columns: 36
+## $ ID                       &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,...
+## $ Age                      &lt;int&gt; 32, 40, 35, 32, 24, 27, 41, 37, 34, 34, 43...
+## $ Attrition                &lt;chr&gt; &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, ...
+## $ BusinessTravel           &lt;chr&gt; &quot;Travel_Rarely&quot;, &quot;Travel_Rarely&quot;, &quot;Travel_...
+## $ DailyRate                &lt;int&gt; 117, 1308, 200, 801, 567, 294, 1283, 309, ...
+## $ Department               &lt;chr&gt; &quot;Sales&quot;, &quot;Research &amp; Development&quot;, &quot;Resear...
+## $ DistanceFromHome         &lt;int&gt; 13, 14, 18, 1, 2, 10, 5, 10, 10, 10, 6, 1,...
+## $ Education                &lt;int&gt; 4, 3, 2, 4, 1, 2, 5, 4, 4, 4, 3, 2, 3, 1, ...
+## $ EducationField           &lt;chr&gt; &quot;Life Sciences&quot;, &quot;Medical&quot;, &quot;Life Sciences...
+## $ EmployeeCount            &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+## $ EmployeeNumber           &lt;int&gt; 859, 1128, 1412, 2016, 1646, 733, 1448, 11...
+## $ EnvironmentSatisfaction  &lt;int&gt; 2, 3, 3, 3, 1, 4, 2, 4, 3, 4, 1, 3, 3, 3, ...
+## $ Gender                   &lt;chr&gt; &quot;Male&quot;, &quot;Male&quot;, &quot;Male&quot;, &quot;Female&quot;, &quot;Female&quot;...
+## $ HourlyRate               &lt;int&gt; 73, 44, 60, 48, 32, 32, 90, 88, 87, 92, 81...
+## $ JobInvolvement           &lt;int&gt; 3, 2, 3, 3, 3, 3, 4, 2, 3, 2, 2, 3, 3, 3, ...
+## $ JobLevel                 &lt;int&gt; 2, 5, 3, 3, 1, 3, 1, 2, 1, 2, 5, 1, 3, 1, ...
+## $ JobRole                  &lt;chr&gt; &quot;Sales Executive&quot;, &quot;Research Director&quot;, &quot;M...
+## $ JobSatisfaction          &lt;int&gt; 4, 3, 4, 4, 4, 1, 3, 4, 3, 3, 3, 4, 3, 2, ...
+## $ MaritalStatus            &lt;chr&gt; &quot;Divorced&quot;, &quot;Single&quot;, &quot;Single&quot;, &quot;Married&quot;,...
+## $ MonthlyIncome            &lt;int&gt; 4403, 19626, 9362, 10422, 3760, 8793, 2127...
+## $ MonthlyRate              &lt;int&gt; 9250, 17544, 19944, 24032, 17218, 4809, 55...
+## $ NumCompaniesWorked       &lt;int&gt; 2, 1, 2, 1, 1, 1, 2, 2, 1, 1, 7, 1, 3, 1, ...
+## $ Over18                   &lt;chr&gt; &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y...
+## $ OverTime                 &lt;chr&gt; &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;Yes&quot;...
+## $ PercentSalaryHike        &lt;int&gt; 11, 14, 11, 19, 13, 21, 12, 14, 19, 14, 13...
+## $ PerformanceRating        &lt;int&gt; 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 4, 3, ...
+## $ RelationshipSatisfaction &lt;int&gt; 3, 1, 3, 3, 3, 3, 1, 3, 4, 2, 4, 2, 2, 1, ...
+## $ StandardHours            &lt;int&gt; 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80...
+## $ StockOptionLevel         &lt;int&gt; 1, 0, 0, 2, 0, 2, 0, 3, 1, 1, 0, 1, 0, 1, ...
+## $ TotalWorkingYears        &lt;int&gt; 8, 21, 10, 14, 6, 9, 7, 8, 1, 8, 21, 3, 17...
+## $ TrainingTimesLastYear    &lt;int&gt; 3, 2, 2, 3, 2, 4, 5, 5, 2, 3, 2, 2, 3, 3, ...
+## $ WorkLifeBalance          &lt;int&gt; 2, 4, 3, 3, 3, 2, 2, 3, 3, 2, 3, 3, 4, 3, ...
+## $ YearsAtCompany           &lt;int&gt; 5, 20, 2, 14, 6, 9, 4, 1, 1, 8, 16, 3, 8, ...
+## $ YearsInCurrentRole       &lt;int&gt; 2, 7, 2, 10, 3, 7, 2, 0, 1, 2, 12, 2, 5, 0...
+## $ YearsSinceLastPromotion  &lt;int&gt; 0, 4, 2, 5, 1, 1, 0, 0, 0, 7, 6, 2, 1, 0, ...
+## $ YearsWithCurrManager     &lt;int&gt; 3, 9, 2, 7, 3, 7, 3, 0, 0, 7, 14, 2, 6, 0,...</code></pre>
+<pre class="r"><code>summary(talent_raw)</code></pre>
+<pre><code>##        ID             Age         Attrition         BusinessTravel    
+##  Min.   :  1.0   Min.   :18.00   Length:870         Length:870        
+##  1st Qu.:218.2   1st Qu.:30.00   Class :character   Class :character  
+##  Median :435.5   Median :35.00   Mode  :character   Mode  :character  
+##  Mean   :435.5   Mean   :36.83                                        
+##  3rd Qu.:652.8   3rd Qu.:43.00                                        
+##  Max.   :870.0   Max.   :60.00                                        
+##    DailyRate       Department        DistanceFromHome   Education    
+##  Min.   : 103.0   Length:870         Min.   : 1.000   Min.   :1.000  
+##  1st Qu.: 472.5   Class :character   1st Qu.: 2.000   1st Qu.:2.000  
+##  Median : 817.5   Mode  :character   Median : 7.000   Median :3.000  
+##  Mean   : 815.2                      Mean   : 9.339   Mean   :2.901  
+##  3rd Qu.:1165.8                      3rd Qu.:14.000   3rd Qu.:4.000  
+##  Max.   :1499.0                      Max.   :29.000   Max.   :5.000  
+##  EducationField     EmployeeCount EmployeeNumber   EnvironmentSatisfaction
+##  Length:870         Min.   :1     Min.   :   1.0   Min.   :1.000          
+##  Class :character   1st Qu.:1     1st Qu.: 477.2   1st Qu.:2.000          
+##  Mode  :character   Median :1     Median :1039.0   Median :3.000          
+##                     Mean   :1     Mean   :1029.8   Mean   :2.701          
+##                     3rd Qu.:1     3rd Qu.:1561.5   3rd Qu.:4.000          
+##                     Max.   :1     Max.   :2064.0   Max.   :4.000          
+##     Gender            HourlyRate     JobInvolvement     JobLevel    
+##  Length:870         Min.   : 30.00   Min.   :1.000   Min.   :1.000  
+##  Class :character   1st Qu.: 48.00   1st Qu.:2.000   1st Qu.:1.000  
+##  Mode  :character   Median : 66.00   Median :3.000   Median :2.000  
+##                     Mean   : 65.61   Mean   :2.723   Mean   :2.039  
+##                     3rd Qu.: 83.00   3rd Qu.:3.000   3rd Qu.:3.000  
+##                     Max.   :100.00   Max.   :4.000   Max.   :5.000  
+##    JobRole          JobSatisfaction MaritalStatus      MonthlyIncome  
+##  Length:870         Min.   :1.000   Length:870         Min.   : 1081  
+##  Class :character   1st Qu.:2.000   Class :character   1st Qu.: 2840  
+##  Mode  :character   Median :3.000   Mode  :character   Median : 4946  
+##                     Mean   :2.709                      Mean   : 6390  
+##                     3rd Qu.:4.000                      3rd Qu.: 8182  
+##                     Max.   :4.000                      Max.   :19999  
+##   MonthlyRate    NumCompaniesWorked    Over18            OverTime        
+##  Min.   : 2094   Min.   :0.000      Length:870         Length:870        
+##  1st Qu.: 8092   1st Qu.:1.000      Class :character   Class :character  
+##  Median :14074   Median :2.000      Mode  :character   Mode  :character  
+##  Mean   :14326   Mean   :2.728                                           
+##  3rd Qu.:20456   3rd Qu.:4.000                                           
+##  Max.   :26997   Max.   :9.000                                           
+##  PercentSalaryHike PerformanceRating RelationshipSatisfaction StandardHours
+##  Min.   :11.0      Min.   :3.000     Min.   :1.000            Min.   :80   
+##  1st Qu.:12.0      1st Qu.:3.000     1st Qu.:2.000            1st Qu.:80   
+##  Median :14.0      Median :3.000     Median :3.000            Median :80   
+##  Mean   :15.2      Mean   :3.152     Mean   :2.707            Mean   :80   
+##  3rd Qu.:18.0      3rd Qu.:3.000     3rd Qu.:4.000            3rd Qu.:80   
+##  Max.   :25.0      Max.   :4.000     Max.   :4.000            Max.   :80   
+##  StockOptionLevel TotalWorkingYears TrainingTimesLastYear WorkLifeBalance
+##  Min.   :0.0000   Min.   : 0.00     Min.   :0.000         Min.   :1.000  
+##  1st Qu.:0.0000   1st Qu.: 6.00     1st Qu.:2.000         1st Qu.:2.000  
+##  Median :1.0000   Median :10.00     Median :3.000         Median :3.000  
+##  Mean   :0.7839   Mean   :11.05     Mean   :2.832         Mean   :2.782  
+##  3rd Qu.:1.0000   3rd Qu.:15.00     3rd Qu.:3.000         3rd Qu.:3.000  
+##  Max.   :3.0000   Max.   :40.00     Max.   :6.000         Max.   :4.000  
+##  YearsAtCompany   YearsInCurrentRole YearsSinceLastPromotion
+##  Min.   : 0.000   Min.   : 0.000     Min.   : 0.000         
+##  1st Qu.: 3.000   1st Qu.: 2.000     1st Qu.: 0.000         
+##  Median : 5.000   Median : 3.000     Median : 1.000         
+##  Mean   : 6.962   Mean   : 4.205     Mean   : 2.169         
+##  3rd Qu.:10.000   3rd Qu.: 7.000     3rd Qu.: 3.000         
+##  Max.   :40.000   Max.   :18.000     Max.   :15.000         
+##  YearsWithCurrManager
+##  Min.   : 0.00       
+##  1st Qu.: 2.00       
+##  Median : 3.00       
+##  Mean   : 4.14       
+##  3rd Qu.: 7.00       
+##  Max.   :17.00</code></pre>
+<p>Convert character to factors, drop columns with no variance</p>
+<pre class="r"><code>talent_factor &lt;- talent_raw %&gt;%
+  mutate_if(is.character, as.factor) %&gt;%
+  dplyr::select(Attrition, everything(), -Over18, -EmployeeCount, -StandardHours)</code></pre>
+<p>Investigate NA values to determine what needs resolution (Nothing is missing)</p>
+<pre class="r"><code>#Verify no missing observations
+md.pattern(talent_factor)</code></pre>
+<pre><code>##  /\     /\
+## {  `---&#39;  }
+## {  O   O  }
+## ==&gt;  V &lt;==  No need for mice. This data set is completely observed.
+##  \  \|/  /
+##   `-----&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre><code>##     Attrition ID Age BusinessTravel DailyRate Department DistanceFromHome
+## 870         1  1   1              1         1          1                1
+##             0  0   0              0         0          0                0
+##     Education EducationField EmployeeNumber EnvironmentSatisfaction Gender
+## 870         1              1              1                       1      1
+##             0              0              0                       0      0
+##     HourlyRate JobInvolvement JobLevel JobRole JobSatisfaction MaritalStatus
+## 870          1              1        1       1               1             1
+##              0              0        0       0               0             0
+##     MonthlyIncome MonthlyRate NumCompaniesWorked OverTime PercentSalaryHike
+## 870             1           1                  1        1                 1
+##                 0           0                  0        0                 0
+##     PerformanceRating RelationshipSatisfaction StockOptionLevel
+## 870                 1                        1                1
+##                     0                        0                0
+##     TotalWorkingYears TrainingTimesLastYear WorkLifeBalance YearsAtCompany
+## 870                 1                     1               1              1
+##                     0                     0               0              0
+##     YearsInCurrentRole YearsSinceLastPromotion YearsWithCurrManager  
+## 870                  1                       1                    1 0
+##                      0                       0                    0 0</code></pre>
+<pre class="r"><code>#Summary Statistics and Glimpse into DataTypes and first observations for Training
+glimpse(talent_factor)</code></pre>
+<pre><code>## Rows: 870
+## Columns: 33
+## $ Attrition                &lt;fct&gt; No, No, No, No, No, No, No, No, No, No, No...
+## $ ID                       &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,...
+## $ Age                      &lt;int&gt; 32, 40, 35, 32, 24, 27, 41, 37, 34, 34, 43...
+## $ BusinessTravel           &lt;fct&gt; Travel_Rarely, Travel_Rarely, Travel_Frequ...
+## $ DailyRate                &lt;int&gt; 117, 1308, 200, 801, 567, 294, 1283, 309, ...
+## $ Department               &lt;fct&gt; Sales, Research &amp; Development, Research &amp; ...
+## $ DistanceFromHome         &lt;int&gt; 13, 14, 18, 1, 2, 10, 5, 10, 10, 10, 6, 1,...
+## $ Education                &lt;int&gt; 4, 3, 2, 4, 1, 2, 5, 4, 4, 4, 3, 2, 3, 1, ...
+## $ EducationField           &lt;fct&gt; Life Sciences, Medical, Life Sciences, Mar...
+## $ EmployeeNumber           &lt;int&gt; 859, 1128, 1412, 2016, 1646, 733, 1448, 11...
+## $ EnvironmentSatisfaction  &lt;int&gt; 2, 3, 3, 3, 1, 4, 2, 4, 3, 4, 1, 3, 3, 3, ...
+## $ Gender                   &lt;fct&gt; Male, Male, Male, Female, Female, Male, Ma...
+## $ HourlyRate               &lt;int&gt; 73, 44, 60, 48, 32, 32, 90, 88, 87, 92, 81...
+## $ JobInvolvement           &lt;int&gt; 3, 2, 3, 3, 3, 3, 4, 2, 3, 2, 2, 3, 3, 3, ...
+## $ JobLevel                 &lt;int&gt; 2, 5, 3, 3, 1, 3, 1, 2, 1, 2, 5, 1, 3, 1, ...
+## $ JobRole                  &lt;fct&gt; Sales Executive, Research Director, Manufa...
+## $ JobSatisfaction          &lt;int&gt; 4, 3, 4, 4, 4, 1, 3, 4, 3, 3, 3, 4, 3, 2, ...
+## $ MaritalStatus            &lt;fct&gt; Divorced, Single, Single, Married, Single,...
+## $ MonthlyIncome            &lt;int&gt; 4403, 19626, 9362, 10422, 3760, 8793, 2127...
+## $ MonthlyRate              &lt;int&gt; 9250, 17544, 19944, 24032, 17218, 4809, 55...
+## $ NumCompaniesWorked       &lt;int&gt; 2, 1, 2, 1, 1, 1, 2, 2, 1, 1, 7, 1, 3, 1, ...
+## $ OverTime                 &lt;fct&gt; No, No, No, No, Yes, No, Yes, Yes, Yes, No...
+## $ PercentSalaryHike        &lt;int&gt; 11, 14, 11, 19, 13, 21, 12, 14, 19, 14, 13...
+## $ PerformanceRating        &lt;int&gt; 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 4, 3, ...
+## $ RelationshipSatisfaction &lt;int&gt; 3, 1, 3, 3, 3, 3, 1, 3, 4, 2, 4, 2, 2, 1, ...
+## $ StockOptionLevel         &lt;int&gt; 1, 0, 0, 2, 0, 2, 0, 3, 1, 1, 0, 1, 0, 1, ...
+## $ TotalWorkingYears        &lt;int&gt; 8, 21, 10, 14, 6, 9, 7, 8, 1, 8, 21, 3, 17...
+## $ TrainingTimesLastYear    &lt;int&gt; 3, 2, 2, 3, 2, 4, 5, 5, 2, 3, 2, 2, 3, 3, ...
+## $ WorkLifeBalance          &lt;int&gt; 2, 4, 3, 3, 3, 2, 2, 3, 3, 2, 3, 3, 4, 3, ...
+## $ YearsAtCompany           &lt;int&gt; 5, 20, 2, 14, 6, 9, 4, 1, 1, 8, 16, 3, 8, ...
+## $ YearsInCurrentRole       &lt;int&gt; 2, 7, 2, 10, 3, 7, 2, 0, 1, 2, 12, 2, 5, 0...
+## $ YearsSinceLastPromotion  &lt;int&gt; 0, 4, 2, 5, 1, 1, 0, 0, 0, 7, 6, 2, 1, 0, ...
+## $ YearsWithCurrManager     &lt;int&gt; 3, 9, 2, 7, 3, 7, 3, 0, 0, 7, 14, 2, 6, 0,...</code></pre>
+<pre class="r"><code>summary(talent_factor)</code></pre>
+<pre><code>##  Attrition       ID             Age                  BusinessTravel
+##  No :730   Min.   :  1.0   Min.   :18.00   Non-Travel       : 94   
+##  Yes:140   1st Qu.:218.2   1st Qu.:30.00   Travel_Frequently:158   
+##            Median :435.5   Median :35.00   Travel_Rarely    :618   
+##            Mean   :435.5   Mean   :36.83                           
+##            3rd Qu.:652.8   3rd Qu.:43.00                           
+##            Max.   :870.0   Max.   :60.00                           
+##                                                                    
+##    DailyRate                       Department  DistanceFromHome   Education    
+##  Min.   : 103.0   Human Resources       : 35   Min.   : 1.000   Min.   :1.000  
+##  1st Qu.: 472.5   Research &amp; Development:562   1st Qu.: 2.000   1st Qu.:2.000  
+##  Median : 817.5   Sales                 :273   Median : 7.000   Median :3.000  
+##  Mean   : 815.2                                Mean   : 9.339   Mean   :2.901  
+##  3rd Qu.:1165.8                                3rd Qu.:14.000   3rd Qu.:4.000  
+##  Max.   :1499.0                                Max.   :29.000   Max.   :5.000  
+##                                                                                
+##           EducationField EmployeeNumber   EnvironmentSatisfaction    Gender   
+##  Human Resources : 15    Min.   :   1.0   Min.   :1.000           Female:354  
+##  Life Sciences   :358    1st Qu.: 477.2   1st Qu.:2.000           Male  :516  
+##  Marketing       :100    Median :1039.0   Median :3.000                       
+##  Medical         :270    Mean   :1029.8   Mean   :2.701                       
+##  Other           : 52    3rd Qu.:1561.5   3rd Qu.:4.000                       
+##  Technical Degree: 75    Max.   :2064.0   Max.   :4.000                       
+##                                                                               
+##    HourlyRate     JobInvolvement     JobLevel    
+##  Min.   : 30.00   Min.   :1.000   Min.   :1.000  
+##  1st Qu.: 48.00   1st Qu.:2.000   1st Qu.:1.000  
+##  Median : 66.00   Median :3.000   Median :2.000  
+##  Mean   : 65.61   Mean   :2.723   Mean   :2.039  
+##  3rd Qu.: 83.00   3rd Qu.:3.000   3rd Qu.:3.000  
+##  Max.   :100.00   Max.   :4.000   Max.   :5.000  
+##                                                  
+##                       JobRole    JobSatisfaction  MaritalStatus MonthlyIncome  
+##  Sales Executive          :200   Min.   :1.000   Divorced:191   Min.   : 1081  
+##  Research Scientist       :172   1st Qu.:2.000   Married :410   1st Qu.: 2840  
+##  Laboratory Technician    :153   Median :3.000   Single  :269   Median : 4946  
+##  Manufacturing Director   : 87   Mean   :2.709                  Mean   : 6390  
+##  Healthcare Representative: 76   3rd Qu.:4.000                  3rd Qu.: 8182  
+##  Sales Representative     : 53   Max.   :4.000                  Max.   :19999  
+##  (Other)                  :129                                                 
+##   MonthlyRate    NumCompaniesWorked OverTime  PercentSalaryHike
+##  Min.   : 2094   Min.   :0.000      No :618   Min.   :11.0     
+##  1st Qu.: 8092   1st Qu.:1.000      Yes:252   1st Qu.:12.0     
+##  Median :14074   Median :2.000                Median :14.0     
+##  Mean   :14326   Mean   :2.728                Mean   :15.2     
+##  3rd Qu.:20456   3rd Qu.:4.000                3rd Qu.:18.0     
+##  Max.   :26997   Max.   :9.000                Max.   :25.0     
+##                                                                
+##  PerformanceRating RelationshipSatisfaction StockOptionLevel TotalWorkingYears
+##  Min.   :3.000     Min.   :1.000            Min.   :0.0000   Min.   : 0.00    
+##  1st Qu.:3.000     1st Qu.:2.000            1st Qu.:0.0000   1st Qu.: 6.00    
+##  Median :3.000     Median :3.000            Median :1.0000   Median :10.00    
+##  Mean   :3.152     Mean   :2.707            Mean   :0.7839   Mean   :11.05    
+##  3rd Qu.:3.000     3rd Qu.:4.000            3rd Qu.:1.0000   3rd Qu.:15.00    
+##  Max.   :4.000     Max.   :4.000            Max.   :3.0000   Max.   :40.00    
+##                                                                               
+##  TrainingTimesLastYear WorkLifeBalance YearsAtCompany   YearsInCurrentRole
+##  Min.   :0.000         Min.   :1.000   Min.   : 0.000   Min.   : 0.000    
+##  1st Qu.:2.000         1st Qu.:2.000   1st Qu.: 3.000   1st Qu.: 2.000    
+##  Median :3.000         Median :3.000   Median : 5.000   Median : 3.000    
+##  Mean   :2.832         Mean   :2.782   Mean   : 6.962   Mean   : 4.205    
+##  3rd Qu.:3.000         3rd Qu.:3.000   3rd Qu.:10.000   3rd Qu.: 7.000    
+##  Max.   :6.000         Max.   :4.000   Max.   :40.000   Max.   :18.000    
+##                                                                           
+##  YearsSinceLastPromotion YearsWithCurrManager
+##  Min.   : 0.000          Min.   : 0.00       
+##  1st Qu.: 0.000          1st Qu.: 2.00       
+##  Median : 1.000          Median : 3.00       
+##  Mean   : 2.169          Mean   : 4.14       
+##  3rd Qu.: 3.000          3rd Qu.: 7.00       
+##  Max.   :15.000          Max.   :17.00       
+## </code></pre>
+<p>Summary Statistics on additional Data Frames</p>
+<pre class="r"><code>#Summary Statistics and Glimpse into DataTypes and first observations for Test sets
+summary(talent_attrition_test)</code></pre>
+<pre><code>##        ID            Age        BusinessTravel       DailyRate     
+##  Min.   :1171   Min.   :19.00   Length:300         Min.   : 102.0  
+##  1st Qu.:1246   1st Qu.:31.00   Class :character   1st Qu.: 448.0  
+##  Median :1320   Median :36.00   Mode  :character   Median : 775.0  
+##  Mean   :1320   Mean   :37.86                      Mean   : 784.8  
+##  3rd Qu.:1395   3rd Qu.:44.00                      3rd Qu.:1117.0  
+##  Max.   :1470   Max.   :60.00                      Max.   :1490.0  
+##   Department        DistanceFromHome   Education     EducationField    
+##  Length:300         Min.   : 1.00    Min.   :1.000   Length:300        
+##  Class :character   1st Qu.: 2.00    1st Qu.:2.000   Class :character  
+##  Mode  :character   Median : 7.00    Median :3.000   Mode  :character  
+##                     Mean   : 9.26    Mean   :2.973                     
+##                     3rd Qu.:14.00    3rd Qu.:4.000                     
+##                     Max.   :29.00    Max.   :5.000                     
+##  EmployeeCount EmployeeNumber   EnvironmentSatisfaction    Gender         
+##  Min.   :1     Min.   :   2.0   Min.   :1.000           Length:300        
+##  1st Qu.:1     1st Qu.: 508.8   1st Qu.:2.000           Class :character  
+##  Median :1     Median : 994.5   Median :3.000           Mode  :character  
+##  Mean   :1     Mean   :1020.9   Mean   :2.733                             
+##  3rd Qu.:1     3rd Qu.:1542.5   3rd Qu.:4.000                             
+##  Max.   :1     Max.   :2065.0   Max.   :4.000                             
+##    HourlyRate     JobInvolvement     JobLevel     JobRole         
+##  Min.   : 30.00   Min.   :1.000   Min.   :1.0   Length:300        
+##  1st Qu.: 50.00   1st Qu.:2.000   1st Qu.:1.0   Class :character  
+##  Median : 66.00   Median :3.000   Median :2.0   Mode  :character  
+##  Mean   : 66.07   Mean   :2.743   Mean   :2.2                     
+##  3rd Qu.: 83.00   3rd Qu.:3.000   3rd Qu.:3.0                     
+##  Max.   :100.00   Max.   :4.000   Max.   :5.0                     
+##  JobSatisfaction MaritalStatus      MonthlyIncome    MonthlyRate   
+##  Min.   :1.000   Length:300         Min.   : 1232   Min.   : 2097  
+##  1st Qu.:2.000   Class :character   1st Qu.: 3034   1st Qu.: 8420  
+##  Median :3.000   Mode  :character   Median : 5208   Median :15091  
+##  Mean   :2.767                      Mean   : 7103   Mean   :14499  
+##  3rd Qu.:4.000                      3rd Qu.: 9750   3rd Qu.:20330  
+##  Max.   :4.000                      Max.   :19973   Max.   :26914  
+##  NumCompaniesWorked    Over18            OverTime         PercentSalaryHike
+##  Min.   :0.000      Length:300         Length:300         Min.   :11.00    
+##  1st Qu.:1.000      Class :character   Class :character   1st Qu.:12.00    
+##  Median :2.000      Mode  :character   Mode  :character   Median :14.00    
+##  Mean   :2.547                                            Mean   :15.17    
+##  3rd Qu.:4.000                                            3rd Qu.:18.00    
+##  Max.   :9.000                                            Max.   :25.00    
+##  PerformanceRating RelationshipSatisfaction StandardHours StockOptionLevel
+##  Min.   :3.000     Min.   :1.000            Min.   :80    Min.   :0.0000  
+##  1st Qu.:3.000     1st Qu.:2.000            1st Qu.:80    1st Qu.:0.0000  
+##  Median :3.000     Median :3.000            Median :80    Median :1.0000  
+##  Mean   :3.153     Mean   :2.803            Mean   :80    Mean   :0.7833  
+##  3rd Qu.:3.000     3rd Qu.:4.000            3rd Qu.:80    3rd Qu.:1.0000  
+##  Max.   :4.000     Max.   :4.000            Max.   :80    Max.   :3.0000  
+##  TotalWorkingYears TrainingTimesLastYear WorkLifeBalance YearsAtCompany  
+##  Min.   : 0.00     Min.   :0.000         Min.   :1.000   Min.   : 0.000  
+##  1st Qu.: 6.00     1st Qu.:2.000         1st Qu.:2.000   1st Qu.: 3.000  
+##  Median :10.00     Median :2.000         Median :3.000   Median : 5.000  
+##  Mean   :12.44     Mean   :2.683         Mean   :2.747   Mean   : 7.527  
+##  3rd Qu.:18.00     3rd Qu.:3.000         3rd Qu.:3.000   3rd Qu.:10.000  
+##  Max.   :38.00     Max.   :6.000         Max.   :4.000   Max.   :37.000  
+##  YearsInCurrentRole YearsSinceLastPromotion YearsWithCurrManager
+##  Min.   : 0.00      Min.   : 0.00           Min.   : 0.00       
+##  1st Qu.: 2.00      1st Qu.: 0.00           1st Qu.: 2.00       
+##  Median : 3.00      Median : 1.00           Median : 3.00       
+##  Mean   : 4.33      Mean   : 2.29           Mean   : 4.38       
+##  3rd Qu.: 7.00      3rd Qu.: 3.00           3rd Qu.: 7.00       
+##  Max.   :18.00      Max.   :15.00           Max.   :17.00</code></pre>
+<pre class="r"><code>summary(talent_salary_test)</code></pre>
+<pre><code>##        ID              Age         Attrition         BusinessTravel    
+##  Min.   : 871.0   Min.   :18.00   Length:300         Length:300        
+##  1st Qu.: 945.8   1st Qu.:29.00   Class :character   Class :character  
+##  Median :1020.5   Median :36.00   Mode  :character   Mode  :character  
+##  Mean   :1020.5   Mean   :36.27                                        
+##  3rd Qu.:1095.2   3rd Qu.:42.00                                        
+##  Max.   :1170.0   Max.   :60.00                                        
+##    DailyRate       Department        DistanceFromHome   Education    
+##  Min.   : 105.0   Length:300         Min.   : 1.00    Min.   :1.000  
+##  1st Qu.: 429.2   Class :character   1st Qu.: 2.00    1st Qu.:2.000  
+##  Median : 693.0   Mode  :character   Median : 7.00    Median :3.000  
+##  Mean   : 783.2                      Mean   : 8.70    Mean   :2.887  
+##  3rd Qu.:1171.2                      3rd Qu.:11.25    3rd Qu.:4.000  
+##  Max.   :1492.0                      Max.   :29.00    Max.   :5.000  
+##  EducationField     EmployeeCount EmployeeNumber EnvironmentSatisfaction
+##  Length:300         Min.   :1     Min.   :   7   Min.   :1.00           
+##  Class :character   1st Qu.:1     1st Qu.: 477   1st Qu.:2.00           
+##  Mode  :character   Median :1     Median :1008   Median :3.00           
+##                     Mean   :1     Mean   :1014   Mean   :2.77           
+##                     3rd Qu.:1     3rd Qu.:1569   3rd Qu.:4.00           
+##                     Max.   :1     Max.   :2068   Max.   :4.00           
+##     Gender            HourlyRate     JobInvolvement     JobLevel
+##  Length:300         Min.   : 30.00   Min.   :1.000   Min.   :1  
+##  Class :character   1st Qu.: 48.00   1st Qu.:2.000   1st Qu.:1  
+##  Mode  :character   Median : 66.00   Median :3.000   Median :2  
+##                     Mean   : 66.52   Mean   :2.737   Mean   :2  
+##                     3rd Qu.: 85.25   3rd Qu.:3.000   3rd Qu.:2  
+##                     Max.   :100.00   Max.   :4.000   Max.   :5  
+##    JobRole          JobSatisfaction MaritalStatus       MonthlyRate   
+##  Length:300         Min.   :1.000   Length:300         Min.   : 2122  
+##  Class :character   1st Qu.:2.000   Class :character   1st Qu.: 7778  
+##  Mode  :character   Median :3.000   Mode  :character   Median :13508  
+##                     Mean   :2.747                      Mean   :14091  
+##                     3rd Qu.:4.000                      3rd Qu.:20464  
+##                     Max.   :4.000                      Max.   :26999  
+##  NumCompaniesWorked    Over18            OverTime         PercentSalaryHike
+##  Min.   :0.00       Length:300         Length:300         Min.   :11.00    
+##  1st Qu.:1.00       Class :character   Class :character   1st Qu.:12.75    
+##  Median :2.00       Mode  :character   Mode  :character   Median :14.00    
+##  Mean   :2.74                                             Mean   :15.28    
+##  3rd Qu.:4.00                                             3rd Qu.:18.00    
+##  Max.   :9.00                                             Max.   :25.00    
+##  PerformanceRating RelationshipSatisfaction StandardHours StockOptionLevel
+##  Min.   :3.00      Min.   :1.000            Min.   :80    Min.   :0.0000  
+##  1st Qu.:3.00      1st Qu.:2.000            1st Qu.:80    1st Qu.:0.0000  
+##  Median :3.00      Median :3.000            Median :80    Median :1.0000  
+##  Mean   :3.16      Mean   :2.637            Mean   :80    Mean   :0.8333  
+##  3rd Qu.:3.00      3rd Qu.:4.000            3rd Qu.:80    3rd Qu.:1.0000  
+##  Max.   :4.00      Max.   :4.000            Max.   :80    Max.   :3.0000  
+##  TotalWorkingYears TrainingTimesLastYear WorkLifeBalance YearsAtCompany  
+##  Min.   : 0.00     Min.   :0.00          Min.   :1.000   Min.   : 0.000  
+##  1st Qu.: 6.00     1st Qu.:2.00          1st Qu.:2.000   1st Qu.: 3.000  
+##  Median : 9.00     Median :3.00          Median :3.000   Median : 5.000  
+##  Mean   :10.78     Mean   :2.82          Mean   :2.717   Mean   : 6.623  
+##  3rd Qu.:14.00     3rd Qu.:3.00          3rd Qu.:3.000   3rd Qu.: 9.000  
+##  Max.   :40.00     Max.   :6.00          Max.   :4.000   Max.   :33.000  
+##  YearsInCurrentRole YearsSinceLastPromotion YearsWithCurrManager
+##  Min.   : 0.0       Min.   : 0.00           Min.   : 0.000      
+##  1st Qu.: 2.0       1st Qu.: 0.00           1st Qu.: 2.000      
+##  Median : 3.0       Median : 1.00           Median : 3.000      
+##  Mean   : 4.2       Mean   : 2.14           Mean   : 3.817      
+##  3rd Qu.: 7.0       3rd Qu.: 3.00           3rd Qu.: 7.000      
+##  Max.   :16.0       Max.   :15.00           Max.   :15.000</code></pre>
+<p>Attrition Properties in Dataset</p>
+<pre class="r"><code>prop.table(table(talent_factor$Attrition))</code></pre>
+<pre><code>## 
+##        No       Yes 
+## 0.8390805 0.1609195</code></pre>
+<p>Create data frame of continuous variables and summarize means values for attrition factor. Creation Correlation Matrix for continuous variable.</p>
+<pre class="r"><code>talent_continuous &lt;- talent_factor[, c(&quot;YearsWithCurrManager&quot;, &quot;YearsSinceLastPromotion&quot;, &quot;YearsInCurrentRole&quot;, &quot;YearsAtCompany&quot;, &quot;PerformanceRating&quot;,
+                                       &quot;TotalWorkingYears&quot;, &quot;PercentSalaryHike&quot;, &quot;MonthlyIncome&quot;, &quot;MonthlyRate&quot;, &quot;HourlyRate&quot;, &quot;DailyRate&quot;, &quot;WorkLifeBalance&quot;, &quot;OverTime&quot;,
+                                       &quot;DistanceFromHome&quot;, &quot;Age&quot;, &quot;Attrition&quot;, &quot;JobSatisfaction&quot;, &quot;JobLevel&quot;, &quot;RelationshipSatisfaction&quot;, &quot;EnvironmentSatisfaction&quot;)]
+
+
+talent_continuous$Attrition &lt;- as.numeric(talent_continuous$Attrition) - 1
+talent_continuous$OverTime &lt;- as.numeric(talent_continuous$OverTime) - 1
+
+employees_left &lt;- talent_continuous %&gt;% filter(talent_continuous$Attrition == 1)
+employees_stayed &lt;- talent_continuous %&gt;% filter(talent_continuous$Attrition == 0)
+mean_employees_left &lt;- lapply(employees_left, mean)
+mean_employees_stayed &lt;- lapply(employees_stayed, mean)
+
+mean_employees &lt;- merge(mean_employees_left, mean_employees_stayed, all=TRUE)
+mean_employees</code></pre>
+<pre><code>##   YearsWithCurrManager YearsSinceLastPromotion YearsInCurrentRole
+## 1             2.942857                2.135714           2.907143
+## 2             4.369863                2.175342           4.453425
+##   YearsAtCompany PerformanceRating TotalWorkingYears PercentSalaryHike
+## 1       5.192857          3.164286          8.185714          15.32857
+## 2       7.301370          3.149315         11.602740          15.17534
+##   MonthlyIncome MonthlyRate HourlyRate DailyRate WorkLifeBalance  OverTime
+## 1      4764.786    13624.29   67.29286  784.2929        2.635714 0.5714286
+## 2      6702.000    14460.12   65.29178  821.1603        2.809589 0.2356164
+##   DistanceFromHome      Age Attrition JobSatisfaction JobLevel
+## 1        10.957143 33.78571         1        2.435714 1.635714
+## 2         9.028767 37.41233         0        2.761644 2.116438
+##   RelationshipSatisfaction EnvironmentSatisfaction
+## 1                 2.607143                2.507143
+## 2                 2.726027                2.738356</code></pre>
+<pre class="r"><code># Age - Left Company (Y/N)
+# - Yes = 33.78
+# - No = 37.41
+#
+# Monthly Income
+# - Yes = $4,764
+# - No = $6,702
+#
+# Job Satisfaction | Environment Satisfaction | Relationship Satisfaction
+# - Yes = 2.44       2.51                       2.61
+# - No = 2.76        2.73                       2.72
+#
+# Years with Current Manager | Years Since Last Promo | Years in Current Role
+# - Yes = 2.94                 2.13                     2.90
+# - No = 4.369863              2.17                     4.54
+#
+#  Total Working Years
+# - Yes = 8.19
+# - No = 11.60
+
+# Performance Rating | Percent Salary Hike
+# - Yes = 3.16         15.33
+# - No = 3.15          15.17  
+#
+# Work Life               | Dist from Home
+# - Yes = 2.63              10.96
+# - No = 2.80               9.02</code></pre>
+<p>Correlation Matrix for data</p>
+<pre class="r"><code>correlations &lt;- round(cor(talent_continuous), 1)
+
+# method = &quot;circle&quot;
+ggcorrplot(correlations, hc.order = TRUE, type = &quot;lower&quot;,
+           lab = TRUE)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code># During review of the correlation matrix, we can see high instances of correlation in the variables below.
+# They will be removed in future analysis.
+#
+# High collinearity:
+# - Performance Rating with Percent Salary Hike
+# - Monthly Income with Job Level
+# - Age and Total Working years
+# - Years at Current Role with Years at Company
+# - Years at Company with Years with Current Manager
+#
+# Variables to drop :
+# - Percent Salary Hike
+# - Job Level
+# - Total Working Years
+# - Years at Company</code></pre>
+<p>Additional insights from data</p>
+<pre class="r"><code>talent_factor$agegroup &lt;- with(talent_factor, ifelse(Age &lt; 25, &quot;18-24&quot;, ifelse(Age &lt; 34, &quot;25-34&quot;, ifelse(Age &lt; 44, &quot;35-44&quot;, ifelse(Age &lt; 52, &quot;45 - 52&quot;, &quot;Over53&quot;)))))
+talent_attrition_test$agegroup &lt;- with(talent_attrition_test, ifelse(Age &lt; 25, &quot;18-24&quot;, ifelse(Age &lt; 34, &quot;25-34&quot;, ifelse(Age &lt; 44, &quot;35-44&quot;, ifelse(Age &lt; 52, &quot;45 - 52&quot;, &quot;Over53&quot;)))))
+talent_salary_test$agegroup &lt;- with(talent_salary_test, ifelse(Age &lt; 25, &quot;18-24&quot;, ifelse(Age &lt; 34, &quot;25-34&quot;, ifelse(Age &lt; 44, &quot;35-44&quot;, ifelse(Age &lt; 52, &quot;45 - 52&quot;, &quot;Over53&quot;)))))
+age_count &lt;- table(talent_factor$agegroup)
+barplot(age_count, main = &quot;Age Count&quot;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>### Mean Salary for Job Title/ Education and Salary
+
+talent_factor_jobtitle_mean &lt;- talent_factor %&gt;% dplyr::group_by(JobRole) %&gt;% dplyr::summarise(MedSalary = median(MonthlyIncome, na.rm=TRUE),Meansatis= mean(JobSatisfaction, na.rm=TRUE))</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code>#Subsetting the job satisfaction data into top/bottoms
+mean_jobsatisfaction &lt;- talent_factor_jobtitle_mean %&gt;% arrange(desc(Meansatis))
+#Subsetting the salary data into top/bottoms
+mean_salary &lt;- talent_factor_jobtitle_mean %&gt;% arrange(desc(MedSalary))
+#Mean Job Satisfaction by Job Role
+ggplot(mean_jobsatisfaction, aes(x=reorder(JobRole,-Meansatis),y=Meansatis,fill=JobRole)) + geom_bar(stat = &quot;identity&quot;)  + theme(plot.title = element_text(hjust=0.1), axis.text.x = element_text(hjust = 0.9, angle = 65)) + labs(x=&quot;Job Role&quot;, y=&quot;Mean Job Satisfaction&quot;, title = &quot;Job Satisfaction by Title&quot;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<pre class="r"><code>#Median Income by Job Role
+ggplot(mean_salary, aes(x=reorder(JobRole,-MedSalary),y=MedSalary,fill=JobRole)) + geom_bar(stat = &quot;identity&quot;)  + theme(plot.title = element_text(hjust=0.1), axis.text.x = element_text(hjust = 0.9, angle = 65)) + labs(x=&quot;Job Role&quot;, y=&quot;Median Monthly Salary&quot;, title = &quot;Median Monthly Salary by Title&quot;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-10-3.png" width="672" /></p>
+<pre class="r"><code>#Attrition plotting
+Attritionplot &lt;- ggplot(talent_factor, aes(x=DailyRate, y=MonthlyIncome), title =&#39;Attrition&#39;) + geom_point()
+Attritionplot + facet_wrap(~Attrition)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-10-4.png" width="672" /></p>
+<pre class="r"><code>Satisfactionplot &lt;- ggplot(talent_factor, aes(x=DailyRate, y=MonthlyIncome), title =&#39;Attrition&#39;) + geom_point()
+Attritionplot + facet_wrap(~JobSatisfaction)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-10-5.png" width="672" /></p>
+<pre class="r"><code>Attritionsat &lt;- ggplot(talent_factor, aes(x=JobSatisfaction, y=MonthlyIncome), title =&#39;Attrition&#39;) + geom_point()
+Attritionsat + facet_wrap(~Attrition)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-10-6.png" width="672" /></p>
+<pre class="r"><code>ggplot(talent_factor, aes(x=JobRole, fill=Attrition)) + geom_bar() +  labs(x = &quot;Job Role&quot;, y = &quot;Number of Employees&quot;, title = &quot;Attrition Job Role&quot;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-10-7.png" width="672" /></p>
+<pre class="r"><code># Distance from home grouping
+talent_factor$DistanceGrouping &lt;- with(talent_factor, ifelse(DistanceFromHome &gt; 25, &quot;25+ Miles&quot;, ifelse(DistanceFromHome &gt; 18, &quot;19 - 25 Miles&quot;, ifelse(DistanceFromHome &gt; 10, &quot;11 - 18 Miles&quot;, ifelse(DistanceFromHome &gt;5, &quot;6 - 10 Miles&quot;, &quot;Less than 6  Miles&quot;)))))
+talent_attrition_test$DistanceGrouping &lt;- with(talent_attrition_test, ifelse(DistanceFromHome &gt; 25, &quot;25+ Miles&quot;, ifelse(DistanceFromHome &gt; 18, &quot;19 - 25 Miles&quot;, ifelse(DistanceFromHome &gt; 10, &quot;11 - 18 Miles&quot;, ifelse(DistanceFromHome &gt;5, &quot;6 - 10 Miles&quot;, &quot;Less than 6  Miles&quot;)))))
+talent_salary_test$DistanceGrouping &lt;- with(talent_salary_test, ifelse(DistanceFromHome &gt; 25, &quot;25+ Miles&quot;, ifelse(DistanceFromHome &gt; 18, &quot;19 - 25 Miles&quot;, ifelse(DistanceFromHome &gt; 10, &quot;11 - 18 Miles&quot;, ifelse(DistanceFromHome &gt;5, &quot;6 - 10 Miles&quot;, &quot;Less than 6  Miles&quot;)))))
+ggplot(talent_factor, aes(x=reorder(DistanceGrouping, DistanceFromHome), fill=Attrition)) + geom_bar()  + labs(x = &quot;Distance From Home Group&quot;, y = &quot;Number of Employees&quot;, title = &quot;Attrition and Distance from Home&quot;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-10-8.png" width="672" /></p>
+<p>GGPairs broken down by various Talent Factor classes</p>
+<pre class="r"><code>##GGPairs Correlation matrix broken down into different themed groups
+##Observations based upon the output
+
+#Employee measurements
+#People that left were younger
+#People that left were less educated
+talent_employee &lt;- talent_factor %&gt;% dplyr::select(Attrition, Age, Education, Gender, MaritalStatus)
+ggpairs(talent_employee, aes(colour = Attrition))</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>#Employer based measurements
+#Pople who left had less time in role , at company, job level, enviornment satisfication
+talent_company &lt;- talent_factor %&gt;% dplyr::select(Attrition, EnvironmentSatisfaction, JobInvolvement, YearsInCurrentRole, YearsAtCompany , JobLevel)
+ggpairs(talent_company, aes(colour = Attrition))</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<pre class="r"><code>#EmployeeWorkLifeBalance
+#Maybe distance from home
+talent_wellbeing &lt;- talent_factor %&gt;% dplyr::select(Attrition, BusinessTravel, DistanceFromHome, WorkLifeBalance)
+ggpairs(talent_wellbeing, aes(colour = Attrition))</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-11-3.png" width="672" /></p>
+<pre class="r"><code>#Income Based Grouping
+#Not Seeing strong correlation with attrition in relation to salary. Drop OverTime, StockOptionLevel no real info. Add SalaryHike
+talent_income &lt;- talent_factor %&gt;% dplyr::select(Attrition, DailyRate, HourlyRate, MonthlyRate, MonthlyIncome, PercentSalaryHike )
+ggpairs(talent_income, aes(colour = Attrition))</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-11-4.png" width="672" /></p>
+<p>Scatterplots of additional data points</p>
+<pre class="r"><code># People who left salary left made less over time
+ggscatter(
+  talent_factor, x = &quot;TotalWorkingYears&quot;, y = &quot;MonthlyIncome&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code># People who left made less to start but slalary increased same
+ggscatter(
+  talent_factor, x = &quot;YearsAtCompany&quot;, y = &quot;MonthlyIncome&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
+<pre class="r"><code># People who left had fewer total working year and years at company
+ggscatter(
+  talent_factor, x = &quot;TotalWorkingYears&quot;, y = &quot;YearsAtCompany&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-3.png" width="672" /></p>
+<pre class="r"><code># People who left had fewer years with current manager / current role (to start with)
+ggscatter(
+  talent_factor, x = &quot;YearsWithCurrManager&quot;, y = &quot;TotalWorkingYears&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-4.png" width="672" /></p>
+<pre class="r"><code># People who left had fewer years in current role (to start with)
+ggscatter(
+  talent_factor, x = &quot;YearsInCurrentRole&quot;, y = &quot;TotalWorkingYears&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-5.png" width="672" /></p>
+<pre class="r"><code># Attrition -&gt; People who left at 1/2 as much time at current company (to start)
+ggscatter(
+  talent_factor, x = &quot;YearsWithCurrManager&quot;, y = &quot;YearsAtCompany&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-6.png" width="672" /></p>
+<pre class="r"><code># Attrition -&gt; People who left at 1/2 as much time at current company (to start)
+ggscatter(
+  talent_factor, x = &quot;YearsInCurrentRole&quot;, y = &quot;YearsAtCompany&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-7.png" width="672" /></p>
+<pre class="r"><code># Attrition -&gt; People with left had 1/2 the time with current manager since last promotion (same as below, can remove one)
+ggscatter(
+  talent_factor, x = &quot;YearsSinceLastPromotion&quot;, y = &quot;YearsInCurrentRole&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-8.png" width="672" /></p>
+<pre class="r"><code># Attrition -&gt; People with left had 1/2 the time with current manager since last promotion
+ggscatter(
+  talent_factor, x = &quot;YearsSinceLastPromotion&quot;, y = &quot;YearsWithCurrManager&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-9.png" width="672" /></p>
+<pre class="r"><code># Attrition -&gt; High correlation with same manager and number of years in current role
+ggscatter(
+  talent_factor, x = &quot;YearsInCurrentRole&quot;, y = &quot;YearsWithCurrManager&quot;,
+  color = &quot;Attrition&quot;, palette = &quot;jco&quot;,
+  add = &quot;reg.line&quot;
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-12-10.png" width="672" /></p>
+<p>Modeling our Analysis Global Values</p>
+<pre class="r"><code>#This will be the dataset we use to model our Attrition and Salary Prediction
+set.seed(453)
+
+### Removed high correlation variables from set
+splitPerc = .70
+
+
+talent_factor_model &lt;-  talent_factor %&gt;% dplyr::select(everything(), -YearsAtCompany, -TotalWorkingYears, -JobLevel, -PercentSalaryHike )
+trainInd &lt;- sample(1:dim(talent_factor_model)[1],round(splitPerc * dim(talent_factor_model)[1]))
+
+talent_factor_model_Train = talent_factor_model[trainInd,]
+talent_factor_model_Test = talent_factor_model[-trainInd,]</code></pre>
+<p>Attrition Classification - Linear Regression</p>
+<pre class="r"><code>#Linear Model = need more on this
+talent_attrition_lm &lt;- lm(Attrition ~., data=talent_factor_model_Train)</code></pre>
+<pre><code>## Warning in model.response(mf, &quot;numeric&quot;): using type = &quot;numeric&quot; with a factor
+## response will be ignored</code></pre>
+<pre><code>## Warning in Ops.factor(y, z$residuals): &#39;-&#39; not meaningful for factors</code></pre>
+<pre class="r"><code>talent_attrition_lm</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Attrition ~ ., data = talent_factor_model_Train)
+## 
+## Coefficients:
+##                        (Intercept)                                  ID  
+##                        2.026111137                         0.000001957  
+##                                Age     BusinessTravelTravel_Frequently  
+##                       -0.003651428                         0.074786508  
+##        BusinessTravelTravel_Rarely                           DailyRate  
+##                        0.026166302                        -0.000023211  
+##   DepartmentResearch &amp; Development                     DepartmentSales  
+##                        0.040615551                         0.058248583  
+##                   DistanceFromHome                           Education  
+##                       -0.002293172                        -0.010171566  
+##        EducationFieldLife Sciences             EducationFieldMarketing  
+##                       -0.220195107                        -0.254768922  
+##              EducationFieldMedical                 EducationFieldOther  
+##                       -0.195750551                        -0.237786105  
+##     EducationFieldTechnical Degree                      EmployeeNumber  
+##                       -0.178901861                        -0.000021563  
+##            EnvironmentSatisfaction                          GenderMale  
+##                       -0.034085728                         0.008411764  
+##                         HourlyRate                      JobInvolvement  
+##                        0.000498024                        -0.065081783  
+##             JobRoleHuman Resources        JobRoleLaboratory Technician  
+##                       -0.006825968                         0.049920205  
+##                     JobRoleManager       JobRoleManufacturing Director  
+##                       -0.149693153                        -0.105179159  
+##           JobRoleResearch Director           JobRoleResearch Scientist  
+##                       -0.200350300                        -0.045377377  
+##             JobRoleSales Executive         JobRoleSales Representative  
+##                       -0.032329301                         0.189671685  
+##                    JobSatisfaction                MaritalStatusMarried  
+##                       -0.037709023                         0.073695181  
+##                MaritalStatusSingle                       MonthlyIncome  
+##                        0.139198122                         0.000003013  
+##                        MonthlyRate                  NumCompaniesWorked  
+##                       -0.000001578                         0.024047624  
+##                        OverTimeYes                   PerformanceRating  
+##                        0.225607390                         0.000088163  
+##           RelationshipSatisfaction                    StockOptionLevel  
+##                       -0.011832837                        -0.010707187  
+##              TrainingTimesLastYear                     WorkLifeBalance  
+##                       -0.022411356                        -0.033140683  
+##                 YearsInCurrentRole             YearsSinceLastPromotion  
+##                       -0.007640878                         0.017726648  
+##               YearsWithCurrManager                       agegroup25-34  
+##                       -0.007048064                         0.006018470  
+##                      agegroup35-44                     agegroup45 - 52  
+##                       -0.108884867                        -0.035349069  
+##                     agegroupOver53       DistanceGrouping19 - 25 Miles  
+##                        0.057856501                         0.034064711  
+##          DistanceGrouping25+ Miles        DistanceGrouping6 - 10 Miles  
+##                       -0.033624586                        -0.099636221  
+## DistanceGroupingLess than 6  Miles  
+##                       -0.122468431</code></pre>
+<p>Naive Bayes</p>
+<pre class="r"><code>NB_model = naiveBayes(talent_factor_model_Train[,-1],as.factor(talent_factor_model_Train$Attrition),laplace = 1)
+table(predict(NB_model,talent_factor_model_Test[,-1]),as.factor(talent_factor_model_Test$Attrition))</code></pre>
+<pre><code>##      
+##        No Yes
+##   No  203  19
+##   Yes  20  19</code></pre>
+<pre class="r"><code>CM = confusionMatrix(table(predict(NB_model,talent_factor_model_Test[,-1]),as.factor(talent_factor_model_Test$Attrition)))
+
+CM</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##      
+##        No Yes
+##   No  203  19
+##   Yes  20  19
+##                                           
+##                Accuracy : 0.8506          
+##                  95% CI : (0.8014, 0.8915)
+##     No Information Rate : 0.8544          
+##     P-Value [Acc &gt; NIR] : 0.6112          
+##                                           
+##                   Kappa : 0.4059          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 1.0000          
+##                                           
+##             Sensitivity : 0.9103          
+##             Specificity : 0.5000          
+##          Pos Pred Value : 0.9144          
+##          Neg Pred Value : 0.4872          
+##              Prevalence : 0.8544          
+##          Detection Rate : 0.7778          
+##    Detection Prevalence : 0.8506          
+##       Balanced Accuracy : 0.7052          
+##                                           
+##        &#39;Positive&#39; Class : No              
+## </code></pre>
+<p>Random Forest</p>
+<pre class="r"><code>RF_talent_factor_model_train &lt;- train(Attrition ~., talent_factor_model_Train, method = &#39;rf&#39;, trControl = trainControl(method=&#39;repeatedcv&#39;), importance = T)
+
+predTrain &lt;- predict(RF_talent_factor_model_train, talent_factor_model_Test)
+confusionMatrix(table(talent_factor_model_Test$Attrition, predTrain))</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##      predTrain
+##        No Yes
+##   No  220   3
+##   Yes  31   7
+##                                           
+##                Accuracy : 0.8697          
+##                  95% CI : (0.8227, 0.9081)
+##     No Information Rate : 0.9617          
+##     P-Value [Acc &gt; NIR] : 1               
+##                                           
+##                   Kappa : 0.2459          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.000003649     
+##                                           
+##             Sensitivity : 0.8765          
+##             Specificity : 0.7000          
+##          Pos Pred Value : 0.9865          
+##          Neg Pred Value : 0.1842          
+##              Prevalence : 0.9617          
+##          Detection Rate : 0.8429          
+##    Detection Prevalence : 0.8544          
+##       Balanced Accuracy : 0.7882          
+##                                           
+##        &#39;Positive&#39; Class : No              
+## </code></pre>
+<pre class="r"><code>cMatrixRF &lt;- table(predTrain, talent_factor_model_Test$Attrition)
+plot(cMatrixRF, col=&quot;blue&quot;, ylab=&quot;Actual&quot;, xlab=&quot;Predicted&quot;, main=&#39;Random Forest Confusion Matrix&#39;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>SVM Model</p>
+<pre class="r"><code>svm_talent_factor_model_train &lt;- train(Attrition ~., talent_factor_model_Train, method = &#39;svmRadial&#39;, trControl = trainControl(method=&#39;repeatedcv&#39;), importance=T)
+predTrainsvm &lt;- predict(svm_talent_factor_model_train, talent_factor_model_Test)
+confusionMatrix(table(talent_factor_model_Test$Attrition, predTrainsvm))</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##      predTrainsvm
+##        No Yes
+##   No  223   0
+##   Yes  34   4
+##                                           
+##                Accuracy : 0.8697          
+##                  95% CI : (0.8227, 0.9081)
+##     No Information Rate : 0.9847          
+##     P-Value [Acc &gt; NIR] : 1               
+##                                           
+##                   Kappa : 0.1674          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.00000001519   
+##                                           
+##             Sensitivity : 0.8677          
+##             Specificity : 1.0000          
+##          Pos Pred Value : 1.0000          
+##          Neg Pred Value : 0.1053          
+##              Prevalence : 0.9847          
+##          Detection Rate : 0.8544          
+##    Detection Prevalence : 0.8544          
+##       Balanced Accuracy : 0.9339          
+##                                           
+##        &#39;Positive&#39; Class : No              
+## </code></pre>
+<pre class="r"><code>cMatrixsvm &lt;- table(predTrainsvm, talent_factor_model_Test$Attrition)
+plot(cMatrixsvm, col=&quot;blue&quot;, ylab=&quot;Actual&quot;, xlab=&quot;Predicted&quot;, main=&#39;Support Vector Machine Confusion Matrix&#39;)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>Feature Engineering for importance variable related to attrition</p>
+<pre class="r"><code>### Feature Importance for Predictive ability
+# ensure results are repeatable
+# load the library
+
+
+# define the control using a random forest selection function
+control &lt;- rfeControl(functions=rfFuncs, method=&quot;cv&quot;, number=10)
+
+# train the model
+results &lt;- rfe(talent_factor[,2:33], talent_factor[,1], sizes=c(2:33), rfeControl=control)
+
+# summarize the results
+print(results)</code></pre>
+<pre><code>## 
+## Recursive feature selection
+## 
+## Outer resampling method: Cross-Validated (10 fold) 
+## 
+## Resampling performance over subset size:
+## 
+##  Variables Accuracy  Kappa AccuracySD KappaSD Selected
+##          2   0.8494 0.1729    0.01833 0.18331         
+##          3   0.8494 0.1674    0.01376 0.14133         
+##          4   0.8494 0.2798    0.01987 0.12301         
+##          5   0.8506 0.2841    0.02234 0.13555         
+##          6   0.8448 0.2569    0.02315 0.12416         
+##          7   0.8391 0.2352    0.02483 0.12111         
+##          8   0.8437 0.2559    0.01643 0.08017         
+##          9   0.8471 0.2800    0.01718 0.07936         
+##         10   0.8460 0.2512    0.01893 0.12433         
+##         11   0.8483 0.2568    0.02154 0.12959         
+##         12   0.8563 0.2995    0.01648 0.10931         
+##         13   0.8575 0.2982    0.01454 0.09822         
+##         14   0.8586 0.2914    0.01718 0.10311         
+##         15   0.8517 0.2572    0.01912 0.10761         
+##         16   0.8540 0.2605    0.01333 0.10640         
+##         17   0.8529 0.2423    0.01781 0.10118         
+##         18   0.8575 0.2584    0.01731 0.11373         
+##         19   0.8586 0.2679    0.01801 0.11619         
+##         20   0.8621 0.2697    0.02099 0.13822         
+##         21   0.8621 0.2708    0.01877 0.12442         
+##         22   0.8586 0.2453    0.02171 0.12669         
+##         23   0.8598 0.2460    0.02013 0.13272         
+##         24   0.8644 0.2714    0.02154 0.13814        *
+##         25   0.8609 0.2503    0.01833 0.12205         
+##         26   0.8632 0.2633    0.01987 0.12627         
+##         27   0.8609 0.2442    0.01912 0.12415         
+##         28   0.8563 0.2272    0.01648 0.10297         
+##         29   0.8586 0.2462    0.01439 0.08889         
+##         30   0.8575 0.2250    0.01349 0.08089         
+##         31   0.8586 0.2333    0.01718 0.10816         
+##         32   0.8540 0.2035    0.01718 0.09603         
+## 
+## The top 5 variables (out of 24):
+##    OverTime, StockOptionLevel, MonthlyIncome, JobRole, Age</code></pre>
+<pre class="r"><code># list the chosen features
+predictors(results)</code></pre>
+<pre><code>##  [1] &quot;OverTime&quot;                &quot;StockOptionLevel&quot;       
+##  [3] &quot;MonthlyIncome&quot;           &quot;JobRole&quot;                
+##  [5] &quot;Age&quot;                     &quot;JobLevel&quot;               
+##  [7] &quot;JobInvolvement&quot;          &quot;TotalWorkingYears&quot;      
+##  [9] &quot;MaritalStatus&quot;           &quot;YearsAtCompany&quot;         
+## [11] &quot;WorkLifeBalance&quot;         &quot;YearsWithCurrManager&quot;   
+## [13] &quot;YearsInCurrentRole&quot;      &quot;EducationField&quot;         
+## [15] &quot;Department&quot;              &quot;YearsSinceLastPromotion&quot;
+## [17] &quot;JobSatisfaction&quot;         &quot;NumCompaniesWorked&quot;     
+## [19] &quot;EnvironmentSatisfaction&quot; &quot;BusinessTravel&quot;         
+## [21] &quot;ID&quot;                      &quot;DistanceFromHome&quot;       
+## [23] &quot;DailyRate&quot;               &quot;Education&quot;</code></pre>
+<pre class="r"><code># plot the results
+plot(results, type=c(&quot;g&quot;, &quot;o&quot;))</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<pre class="r"><code>#Boruta Feature Engineering
+boruta.talent_train &lt;- Boruta(Attrition~., data = talent_factor, doTrace = 2)</code></pre>
+<pre><code>##  1. run of importance source...</code></pre>
+<pre><code>##  2. run of importance source...</code></pre>
+<pre><code>##  3. run of importance source...</code></pre>
+<pre><code>##  4. run of importance source...</code></pre>
+<pre><code>##  5. run of importance source...</code></pre>
+<pre><code>##  6. run of importance source...</code></pre>
+<pre><code>##  7. run of importance source...</code></pre>
+<pre><code>##  8. run of importance source...</code></pre>
+<pre><code>##  9. run of importance source...</code></pre>
+<pre><code>##  10. run of importance source...</code></pre>
+<pre><code>##  11. run of importance source...</code></pre>
+<pre><code>##  12. run of importance source...</code></pre>
+<pre><code>## After 12 iterations, +1.4 secs:</code></pre>
+<pre><code>##  confirmed 8 attributes: Age, JobInvolvement, MaritalStatus, MonthlyIncome, OverTime and 3 more;</code></pre>
+<pre><code>##  rejected 14 attributes: BusinessTravel, DailyRate, DistanceGrouping, Education, EducationField and 9 more;</code></pre>
+<pre><code>##  still have 12 attributes left.</code></pre>
+<pre><code>##  13. run of importance source...</code></pre>
+<pre><code>##  14. run of importance source...</code></pre>
+<pre><code>##  15. run of importance source...</code></pre>
+<pre><code>##  16. run of importance source...</code></pre>
+<pre><code>## After 16 iterations, +1.8 secs:</code></pre>
+<pre><code>##  confirmed 4 attributes: agegroup, JobLevel, JobRole, YearsWithCurrManager;</code></pre>
+<pre><code>##  still have 8 attributes left.</code></pre>
+<pre><code>##  17. run of importance source...</code></pre>
+<pre><code>##  18. run of importance source...</code></pre>
+<pre><code>##  19. run of importance source...</code></pre>
+<pre><code>##  20. run of importance source...</code></pre>
+<pre><code>## After 20 iterations, +2.1 secs:</code></pre>
+<pre><code>##  rejected 1 attribute: DistanceFromHome;</code></pre>
+<pre><code>##  still have 7 attributes left.</code></pre>
+<pre><code>##  21. run of importance source...</code></pre>
+<pre><code>##  22. run of importance source...</code></pre>
+<pre><code>##  23. run of importance source...</code></pre>
+<pre><code>##  24. run of importance source...</code></pre>
+<pre><code>##  25. run of importance source...</code></pre>
+<pre><code>##  26. run of importance source...</code></pre>
+<pre><code>##  27. run of importance source...</code></pre>
+<pre><code>##  28. run of importance source...</code></pre>
+<pre><code>##  29. run of importance source...</code></pre>
+<pre><code>##  30. run of importance source...</code></pre>
+<pre><code>##  31. run of importance source...</code></pre>
+<pre><code>##  32. run of importance source...</code></pre>
+<pre><code>##  33. run of importance source...</code></pre>
+<pre><code>##  34. run of importance source...</code></pre>
+<pre><code>##  35. run of importance source...</code></pre>
+<pre><code>##  36. run of importance source...</code></pre>
+<pre><code>##  37. run of importance source...</code></pre>
+<pre><code>##  38. run of importance source...</code></pre>
+<pre><code>##  39. run of importance source...</code></pre>
+<pre><code>##  40. run of importance source...</code></pre>
+<pre><code>##  41. run of importance source...</code></pre>
+<pre><code>##  42. run of importance source...</code></pre>
+<pre><code>##  43. run of importance source...</code></pre>
+<pre><code>##  44. run of importance source...</code></pre>
+<pre><code>## After 44 iterations, +4 secs:</code></pre>
+<pre><code>##  confirmed 1 attribute: WorkLifeBalance;</code></pre>
+<pre><code>##  still have 6 attributes left.</code></pre>
+<pre><code>##  45. run of importance source...</code></pre>
+<pre><code>##  46. run of importance source...</code></pre>
+<pre><code>##  47. run of importance source...</code></pre>
+<pre><code>##  48. run of importance source...</code></pre>
+<pre><code>##  49. run of importance source...</code></pre>
+<pre><code>##  50. run of importance source...</code></pre>
+<pre><code>##  51. run of importance source...</code></pre>
+<pre><code>##  52. run of importance source...</code></pre>
+<pre><code>##  53. run of importance source...</code></pre>
+<pre><code>##  54. run of importance source...</code></pre>
+<pre><code>##  55. run of importance source...</code></pre>
+<pre><code>##  56. run of importance source...</code></pre>
+<pre><code>##  57. run of importance source...</code></pre>
+<pre><code>##  58. run of importance source...</code></pre>
+<pre><code>##  59. run of importance source...</code></pre>
+<pre><code>## After 59 iterations, +5.1 secs:</code></pre>
+<pre><code>##  confirmed 1 attribute: YearsInCurrentRole;</code></pre>
+<pre><code>##  still have 5 attributes left.</code></pre>
+<pre><code>##  60. run of importance source...</code></pre>
+<pre><code>##  61. run of importance source...</code></pre>
+<pre><code>##  62. run of importance source...</code></pre>
+<pre><code>## After 62 iterations, +5.4 secs:</code></pre>
+<pre><code>##  confirmed 1 attribute: NumCompaniesWorked;</code></pre>
+<pre><code>##  still have 4 attributes left.</code></pre>
+<pre><code>##  63. run of importance source...</code></pre>
+<pre><code>##  64. run of importance source...</code></pre>
+<pre><code>##  65. run of importance source...</code></pre>
+<pre><code>##  66. run of importance source...</code></pre>
+<pre><code>##  67. run of importance source...</code></pre>
+<pre><code>##  68. run of importance source...</code></pre>
+<pre><code>##  69. run of importance source...</code></pre>
+<pre><code>##  70. run of importance source...</code></pre>
+<pre><code>##  71. run of importance source...</code></pre>
+<pre><code>##  72. run of importance source...</code></pre>
+<pre><code>##  73. run of importance source...</code></pre>
+<pre><code>##  74. run of importance source...</code></pre>
+<pre><code>##  75. run of importance source...</code></pre>
+<pre><code>##  76. run of importance source...</code></pre>
+<pre><code>##  77. run of importance source...</code></pre>
+<pre><code>##  78. run of importance source...</code></pre>
+<pre><code>##  79. run of importance source...</code></pre>
+<pre><code>##  80. run of importance source...</code></pre>
+<pre><code>##  81. run of importance source...</code></pre>
+<pre><code>##  82. run of importance source...</code></pre>
+<pre><code>##  83. run of importance source...</code></pre>
+<pre><code>##  84. run of importance source...</code></pre>
+<pre><code>##  85. run of importance source...</code></pre>
+<pre><code>## After 85 iterations, +7.1 secs:</code></pre>
+<pre><code>##  rejected 1 attribute: EnvironmentSatisfaction;</code></pre>
+<pre><code>##  still have 3 attributes left.</code></pre>
+<pre><code>##  86. run of importance source...</code></pre>
+<pre><code>##  87. run of importance source...</code></pre>
+<pre><code>##  88. run of importance source...</code></pre>
+<pre><code>##  89. run of importance source...</code></pre>
+<pre><code>##  90. run of importance source...</code></pre>
+<pre><code>##  91. run of importance source...</code></pre>
+<pre><code>##  92. run of importance source...</code></pre>
+<pre><code>##  93. run of importance source...</code></pre>
+<pre><code>##  94. run of importance source...</code></pre>
+<pre><code>##  95. run of importance source...</code></pre>
+<pre><code>##  96. run of importance source...</code></pre>
+<pre><code>##  97. run of importance source...</code></pre>
+<pre><code>##  98. run of importance source...</code></pre>
+<pre><code>##  99. run of importance source...</code></pre>
+<pre class="r"><code>print(boruta.talent_train)</code></pre>
+<pre><code>## Boruta performed 99 iterations in 8.355957 secs.
+##  15 attributes confirmed important: Age, agegroup, JobInvolvement,
+## JobLevel, JobRole and 10 more;
+##  16 attributes confirmed unimportant: BusinessTravel, DailyRate,
+## DistanceFromHome, DistanceGrouping, Education and 11 more;
+##  3 tentative attributes left: Department, JobSatisfaction,
+## YearsSinceLastPromotion;</code></pre>
+<pre class="r"><code>#take a call on tentative features
+boruta.talent &lt;- TentativeRoughFix(boruta.talent_train)
+print(boruta.talent)</code></pre>
+<pre><code>## Boruta performed 99 iterations in 8.355957 secs.
+## Tentatives roughfixed over the last 99 iterations.
+##  17 attributes confirmed important: Age, agegroup, Department,
+## JobInvolvement, JobLevel and 12 more;
+##  17 attributes confirmed unimportant: BusinessTravel, DailyRate,
+## DistanceFromHome, DistanceGrouping, Education and 12 more;</code></pre>
+<pre class="r"><code>getSelectedAttributes(boruta.talent_train, withTentative = F)</code></pre>
+<pre><code>##  [1] &quot;Age&quot;                  &quot;JobInvolvement&quot;       &quot;JobLevel&quot;            
+##  [4] &quot;JobRole&quot;              &quot;MaritalStatus&quot;        &quot;MonthlyIncome&quot;       
+##  [7] &quot;NumCompaniesWorked&quot;   &quot;OverTime&quot;             &quot;StockOptionLevel&quot;    
+## [10] &quot;TotalWorkingYears&quot;    &quot;WorkLifeBalance&quot;      &quot;YearsAtCompany&quot;      
+## [13] &quot;YearsInCurrentRole&quot;   &quot;YearsWithCurrManager&quot; &quot;agegroup&quot;</code></pre>
+<pre class="r"><code>plot(boruta.talent, xlab = &quot;&quot;, xaxt = &quot;n&quot;)
+lz&lt;-lapply(1:ncol(boruta.talent$ImpHistory),function(i)
+  boruta.talent$ImpHistory[is.finite(boruta.talent$ImpHistory[,i]),i])
+names(lz) &lt;- colnames(boruta.talent$ImpHistory)
+Labels &lt;- sort(sapply(lz,median))
+axis(side = 1,las=2,labels = names(Labels),
+     at = 1:ncol(boruta.talent$ImpHistory), cex.axis = 0.7)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
+<p>Salary Prediction</p>
+<pre class="r"><code>salaryfitincome &lt;- lm(MonthlyIncome ~ ., data = talent_factor_model_Train)
+summary(salaryfitincome)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = MonthlyIncome ~ ., data = talent_factor_model_Train)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4275.5 -1146.9  -194.5   850.6  6979.8 
+## 
+## Coefficients:
+##                                       Estimate  Std. Error t value
+## (Intercept)                         6064.97435  1871.91494   3.240
+## AttritionYes                          98.75463   242.31998   0.408
+## ID                                    -0.13152     0.31388  -0.419
+## Age                                   23.97666    31.36031   0.765
+## BusinessTravelTravel_Frequently      424.51501   297.39100   1.427
+## BusinessTravelTravel_Rarely          669.06384   248.99319   2.687
+## DailyRate                              0.15050     0.20016   0.752
+## DepartmentResearch &amp; Development   -1351.79303  1019.64164  -1.326
+## DepartmentSales                    -2283.88509  1061.75725  -2.151
+## DistanceFromHome                      99.55346    48.47935   2.054
+## Education                            -62.03626    78.35166  -0.792
+## EducationFieldLife Sciences          252.11961   797.66856   0.316
+## EducationFieldMarketing              362.03619   848.31581   0.427
+## EducationFieldMedical                143.18277   796.88881   0.180
+## EducationFieldOther                  517.06650   852.65570   0.606
+## EducationFieldTechnical Degree       211.41705   830.03699   0.255
+## EmployeeNumber                         0.18662     0.12699   1.470
+## EnvironmentSatisfaction               13.72407    69.92842   0.196
+## GenderMale                           105.31498   157.05759   0.671
+## HourlyRate                            -5.51836     3.75374  -1.470
+## JobInvolvement                      -166.02619   110.93706  -1.497
+## JobRoleHuman Resources             -4470.08168  1087.36994  -4.111
+## JobRoleLaboratory Technician       -3629.18482   325.26919 -11.157
+## JobRoleManager                      9914.16458   566.53778  17.500
+## JobRoleManufacturing Director        314.50634   359.85505   0.874
+## JobRoleResearch Director            8647.43137   418.98707  20.639
+## JobRoleResearch Scientist          -3516.07269   315.98359 -11.127
+## JobRoleSales Executive               728.26559   786.01082   0.927
+## JobRoleSales Representative        -3066.12097   846.57432  -3.622
+## JobSatisfaction                       60.52525    69.85605   0.866
+## MaritalStatusMarried                 -87.72685   210.21874  -0.417
+## MaritalStatusSingle                  204.09726   289.13422   0.706
+## MonthlyRate                           -0.01673     0.01099  -1.522
+## NumCompaniesWorked                    62.85755    33.70679   1.865
+## OverTimeYes                          206.31053   185.03891   1.115
+## PerformanceRating                   -327.52353   207.20564  -1.581
+## RelationshipSatisfaction             -37.89386    69.32929  -0.547
+## StockOptionLevel                      24.41334   121.26852   0.201
+## TrainingTimesLastYear                 51.31379    61.79512   0.830
+## WorkLifeBalance                      -75.96340   110.78730  -0.686
+## YearsInCurrentRole                    89.23222    33.80982   2.639
+## YearsSinceLastPromotion              112.54822    30.87254   3.646
+## YearsWithCurrManager                  14.87531    33.63510   0.442
+## agegroup25-34                        -99.40574   412.45104  -0.241
+## agegroup35-44                        234.13200   583.09778   0.402
+## agegroup45 - 52                      250.06540   846.51699   0.295
+## agegroupOver53                       447.40828  1104.37685   0.405
+## DistanceGrouping19 - 25 Miles       -547.93184   498.93699  -1.098
+## DistanceGrouping25+ Miles          -1465.27911   733.87124  -1.997
+## DistanceGrouping6 - 10 Miles         693.32905   398.31074   1.741
+## DistanceGroupingLess than 6  Miles  1077.74395   637.17989   1.691
+##                                                Pr(&gt;|t|)    
+## (Intercept)                                    0.001267 ** 
+## AttritionYes                                   0.683769    
+## ID                                             0.675368    
+## Age                                            0.444860    
+## BusinessTravelTravel_Frequently                0.154006    
+## BusinessTravelTravel_Rarely                    0.007423 ** 
+## DailyRate                                      0.452426    
+## DepartmentResearch &amp; Development               0.185464    
+## DepartmentSales                                0.031902 *  
+## DistanceFromHome                               0.040487 *  
+## Education                                      0.428833    
+## EducationFieldLife Sciences                    0.752067    
+## EducationFieldMarketing                        0.669711    
+## EducationFieldMedical                          0.857471    
+## EducationFieldOther                            0.544483    
+## EducationFieldTechnical Degree                 0.799042    
+## EmployeeNumber                                 0.142258    
+## EnvironmentSatisfaction                        0.844479    
+## GenderMale                                     0.502785    
+## HourlyRate                                     0.142099    
+## JobInvolvement                                 0.135068    
+## JobRoleHuman Resources                        0.0000453 ***
+## JobRoleLaboratory Technician       &lt; 0.0000000000000002 ***
+## JobRoleManager                     &lt; 0.0000000000000002 ***
+## JobRoleManufacturing Director                  0.382505    
+## JobRoleResearch Director           &lt; 0.0000000000000002 ***
+## JobRoleResearch Scientist          &lt; 0.0000000000000002 ***
+## JobRoleSales Executive                         0.354569    
+## JobRoleSales Representative                    0.000319 ***
+## JobSatisfaction                                0.386628    
+## MaritalStatusMarried                           0.676611    
+## MaritalStatusSingle                            0.480550    
+## MonthlyRate                                    0.128491    
+## NumCompaniesWorked                             0.062729 .  
+## OverTimeYes                                    0.265349    
+## PerformanceRating                              0.114520    
+## RelationshipSatisfaction                       0.584887    
+## StockOptionLevel                               0.840525    
+## TrainingTimesLastYear                          0.406676    
+## WorkLifeBalance                                0.493207    
+## YearsInCurrentRole                             0.008541 ** 
+## YearsSinceLastPromotion                        0.000292 ***
+## YearsWithCurrManager                           0.658476    
+## agegroup25-34                                  0.809634    
+## agegroup35-44                                  0.688183    
+## agegroup45 - 52                                0.767794    
+## agegroupOver53                                 0.685542    
+## DistanceGrouping19 - 25 Miles                  0.272591    
+## DistanceGrouping25+ Miles                      0.046349 *  
+## DistanceGrouping6 - 10 Miles                   0.082292 .  
+## DistanceGroupingLess than 6  Miles             0.091313 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1839 on 558 degrees of freedom
+## Multiple R-squared:  0.8546, Adjusted R-squared:  0.8415 
+## F-statistic: 65.58 on 50 and 558 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+<pre class="r"><code>vif(salaryfitincome)</code></pre>
+<pre><code>##                       AttritionYes                                 ID 
+##                           1.474873                           1.087896 
+##                                Age    BusinessTravelTravel_Frequently 
+##                          13.806559                           2.307338 
+##        BusinessTravelTravel_Rarely                          DailyRate 
+##                           2.279195                           1.098149 
+##   DepartmentResearch &amp; Development                    DepartmentSales 
+##                          42.311201                          42.949300 
+##                   DistanceFromHome                          Education 
+##                          27.965469                           1.188483 
+##        EducationFieldLife Sciences            EducationFieldMarketing 
+##                          28.069374                          12.858471 
+##              EducationFieldMedical                EducationFieldOther 
+##                          24.193633                           6.903387 
+##     EducationFieldTechnical Degree                     EmployeeNumber 
+##                           9.692180                           1.079079 
+##            EnvironmentSatisfaction                         GenderMale 
+##                           1.099774                           1.071251 
+##                         HourlyRate                     JobInvolvement 
+##                           1.072541                           1.106691 
+##             JobRoleHuman Resources       JobRoleLaboratory Technician 
+##                           6.765003                           2.820637 
+##                     JobRoleManager      JobRoleManufacturing Director 
+##                           2.878403                           2.071795 
+##           JobRoleResearch Director          JobRoleResearch Scientist 
+##                           1.804542                           2.951310 
+##             JobRoleSales Executive        JobRoleSales Representative 
+##                          19.702710                           6.616596 
+##                    JobSatisfaction               MaritalStatusMarried 
+##                           1.107401                           1.983575 
+##                MaritalStatusSingle                        MonthlyRate 
+##                           3.204211                           1.096191 
+##                 NumCompaniesWorked                        OverTimeYes 
+##                           1.277847                           1.204250 
+##                  PerformanceRating           RelationshipSatisfaction 
+##                           1.052874                           1.066586 
+##                   StockOptionLevel              TrainingTimesLastYear 
+##                           1.952037                           1.101836 
+##                    WorkLifeBalance                 YearsInCurrentRole 
+##                           1.089803                           2.746010 
+##            YearsSinceLastPromotion               YearsWithCurrManager 
+##                           1.678901                           2.522614 
+##                      agegroup25-34                      agegroup35-44 
+##                           6.758746                          14.490986 
+##                    agegroup45 - 52                     agegroupOver53 
+##                          16.107671                          14.726643 
+##      DistanceGrouping19 - 25 Miles          DistanceGrouping25+ Miles 
+##                           4.448009                           5.395912 
+##       DistanceGrouping6 - 10 Miles DistanceGroupingLess than 6  Miles 
+##                           5.666617                          17.875573</code></pre>
+<pre class="r"><code>talent_factor_model_salary &lt;-  talent_factor %&gt;% dplyr::select(everything(), -Age, -DistanceFromHome, -Department )
+trainInd &lt;- sample(1:dim(talent_factor_model_salary)[1],round(splitPerc * dim(talent_factor_model_salary)[1]))
+
+talent_factor_model_salary_Train = talent_factor_model_salary[trainInd,]
+talent_factor_model_salary_Test = talent_factor_model_salary[-trainInd,]
+
+##Interaction rates of all the variables to see collinearity
+## Variables where we are seeing high collinearity within categorical variables, we will leave in. 
+##Significant p-value of &lt;0.0001.
+
+#Variables with High collinearity
+
+# Age/Age Group
+# Distance Grouping
+# Department</code></pre>
+<p>Salary Prediction - LinearRegression</p>
+<pre class="r"><code>#Job role coefficients are going to be the biggest predictors of monthly income. followed by business travel and performance rating.
+salary_predict_lm &lt;- lm(MonthlyIncome ~., data= talent_factor_model_salary_Train)
+summary(salary_predict_lm)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = MonthlyIncome ~ ., data = talent_factor_model_salary_Train)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3624.7  -706.7    24.4   616.2  4065.7 
+## 
+## Coefficients:
+##                                       Estimate  Std. Error t value
+## (Intercept)                        -701.659213  860.659331  -0.815
+## AttritionYes                        202.206680  147.756101   1.369
+## ID                                   -0.125753    0.179817  -0.699
+## BusinessTravelTravel_Frequently     290.681729  176.162322   1.650
+## BusinessTravelTravel_Rarely         428.905532  146.069027   2.936
+## DailyRate                             0.163206    0.113211   1.442
+## Education                           -53.089529   46.797077  -1.134
+## EducationFieldLife Sciences         379.729574  452.935169   0.838
+## EducationFieldMarketing             124.771897  475.428770   0.262
+## EducationFieldMedical               250.003741  455.333691   0.549
+## EducationFieldOther                 267.106958  487.604977   0.548
+## EducationFieldTechnical Degree      370.964968  472.133369   0.786
+## EmployeeNumber                        0.084016    0.076026   1.105
+## EnvironmentSatisfaction              -5.537574   42.036005  -0.132
+## GenderMale                          103.958913   93.166663   1.116
+## HourlyRate                           -1.819169    2.255175  -0.807
+## JobInvolvement                       36.486305   65.692391   0.555
+## JobLevel                           2750.374937  106.503468  25.824
+## JobRoleHuman Resources             -113.436058  395.260256  -0.287
+## JobRoleLaboratory Technician       -719.340161  216.384550  -3.324
+## JobRoleManager                     4303.984979  299.315071  14.379
+## JobRoleManufacturing Director       105.911204  213.699844   0.496
+## JobRoleResearch Director           4120.783562  289.021785  14.258
+## JobRoleResearch Scientist          -379.847189  218.913279  -1.735
+## JobRoleSales Executive               63.315470  193.422833   0.327
+## JobRoleSales Representative        -348.882729  278.312989  -1.254
+## JobSatisfaction                      19.342889   42.311534   0.457
+## MaritalStatusMarried                 55.370021  123.069352   0.450
+## MaritalStatusSingle                  11.327366  167.444557   0.068
+## MonthlyRate                          -0.005317    0.006441  -0.825
+## NumCompaniesWorked                   12.180801   21.565967   0.565
+## OverTimeYes                         -83.186694  106.408737  -0.782
+## PercentSalaryHike                    11.385461   20.276738   0.562
+## PerformanceRating                  -139.734411  205.567634  -0.680
+## RelationshipSatisfaction             33.349408   40.772253   0.818
+## StockOptionLevel                     61.457700   70.376520   0.873
+## TotalWorkingYears                    49.928809   13.674456   3.651
+## TrainingTimesLastYear                16.973690   36.166063   0.469
+## WorkLifeBalance                     -32.986055   64.517983  -0.511
+## YearsAtCompany                      -10.962709   16.762111  -0.654
+## YearsInCurrentRole                    6.822686   20.837470   0.327
+## YearsSinceLastPromotion              38.072771   19.187937   1.984
+## YearsWithCurrManager                -28.593279   20.311903  -1.408
+## agegroup25-34                       106.052130  208.900373   0.508
+## agegroup35-44                       225.536895  216.975039   1.039
+## agegroup45 - 52                     139.178776  250.107145   0.556
+## agegroupOver53                      278.524826  303.997982   0.916
+## DistanceGrouping19 - 25 Miles      -258.847045  178.733277  -1.448
+## DistanceGrouping25+ Miles          -279.006846  236.837358  -1.178
+## DistanceGrouping6 - 10 Miles         35.272247  155.145424   0.227
+## DistanceGroupingLess than 6  Miles  -20.922738  146.651814  -0.143
+##                                                Pr(&gt;|t|)    
+## (Intercept)                                    0.415273    
+## AttritionYes                                   0.171701    
+## ID                                             0.484632    
+## BusinessTravelTravel_Frequently                0.099490 .  
+## BusinessTravelTravel_Rarely                    0.003458 ** 
+## DailyRate                                      0.149975    
+## Education                                      0.257088    
+## EducationFieldLife Sciences                    0.402179    
+## EducationFieldMarketing                        0.793078    
+## EducationFieldMedical                          0.583187    
+## EducationFieldOther                            0.584053    
+## EducationFieldTechnical Degree                 0.432365    
+## EmployeeNumber                                 0.269595    
+## EnvironmentSatisfaction                        0.895242    
+## GenderMale                                     0.264972    
+## HourlyRate                                     0.420204    
+## JobInvolvement                                 0.578836    
+## JobLevel                           &lt; 0.0000000000000002 ***
+## JobRoleHuman Resources                         0.774226    
+## JobRoleLaboratory Technician                   0.000944 ***
+## JobRoleManager                     &lt; 0.0000000000000002 ***
+## JobRoleManufacturing Director                  0.620367    
+## JobRoleResearch Director           &lt; 0.0000000000000002 ***
+## JobRoleResearch Scientist                      0.083267 .  
+## JobRoleSales Executive                         0.743532    
+## JobRoleSales Representative                    0.210526    
+## JobSatisfaction                                0.647738    
+## MaritalStatusMarried                           0.652951    
+## MaritalStatusSingle                            0.946090    
+## MonthlyRate                                    0.409465    
+## NumCompaniesWorked                             0.572426    
+## OverTimeYes                                    0.434684    
+## PercentSalaryHike                              0.574680    
+## PerformanceRating                              0.496945    
+## RelationshipSatisfaction                       0.413738    
+## StockOptionLevel                               0.382892    
+## TotalWorkingYears                              0.000286 ***
+## TrainingTimesLastYear                          0.639020    
+## WorkLifeBalance                                0.609365    
+## YearsAtCompany                                 0.513370    
+## YearsInCurrentRole                             0.743470    
+## YearsSinceLastPromotion                        0.047723 *  
+## YearsWithCurrManager                           0.159774    
+## agegroup25-34                                  0.611886    
+## agegroup35-44                                  0.299041    
+## agegroup45 - 52                                0.578108    
+## agegroupOver53                                 0.359955    
+## DistanceGrouping19 - 25 Miles                  0.148114    
+## DistanceGrouping25+ Miles                      0.239278    
+## DistanceGrouping6 - 10 Miles                   0.820235    
+## DistanceGroupingLess than 6  Miles             0.886603    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1085 on 558 degrees of freedom
+## Multiple R-squared:  0.9467, Adjusted R-squared:  0.942 
+## F-statistic: 198.4 on 50 and 558 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+<pre class="r"><code>vif(salary_predict_lm)</code></pre>
+<pre><code>##                       AttritionYes                                 ID 
+##                           1.536683                           1.084526 
+##    BusinessTravelTravel_Frequently        BusinessTravelTravel_Rarely 
+##                           2.374692                           2.289422 
+##                          DailyRate                          Education 
+##                           1.091138                           1.192046 
+##        EducationFieldLife Sciences            EducationFieldMarketing 
+##                          25.951288                          12.475112 
+##              EducationFieldMedical                EducationFieldOther 
+##                          21.952066                           6.837250 
+##     EducationFieldTechnical Degree                     EmployeeNumber 
+##                           9.313313                           1.099500 
+##            EnvironmentSatisfaction                         GenderMale 
+##                           1.113589                           1.074708 
+##                         HourlyRate                     JobInvolvement 
+##                           1.079177                           1.128328 
+##                           JobLevel             JobRoleHuman Resources 
+##                           6.622441                           2.191921 
+##       JobRoleLaboratory Technician                     JobRoleManager 
+##                           3.531848                           2.576335 
+##      JobRoleManufacturing Director           JobRoleResearch Director 
+##                           2.189927                           1.958733 
+##          JobRoleResearch Scientist             JobRoleSales Executive 
+##                           3.845769                           3.606998 
+##        JobRoleSales Representative                    JobSatisfaction 
+##                           2.343013                           1.134949 
+##               MaritalStatusMarried                MaritalStatusSingle 
+##                           1.952025                           3.056588 
+##                        MonthlyRate                 NumCompaniesWorked 
+##                           1.073896                           1.498089 
+##                        OverTimeYes                  PercentSalaryHike 
+##                           1.178029                           2.915948 
+##                  PerformanceRating           RelationshipSatisfaction 
+##                           2.876632                           1.069947 
+##                   StockOptionLevel                  TotalWorkingYears 
+##                           1.875215                           5.612303 
+##              TrainingTimesLastYear                    WorkLifeBalance 
+##                           1.119633                           1.077238 
+##                     YearsAtCompany                 YearsInCurrentRole 
+##                           5.671875                           3.091834 
+##            YearsSinceLastPromotion               YearsWithCurrManager 
+##                           1.943399                           2.726974 
+##                      agegroup25-34                      agegroup35-44 
+##                           4.924619                           5.812262 
+##                    agegroup45 - 52                     agegroupOver53 
+##                           4.147808                           3.068046 
+##      DistanceGrouping19 - 25 Miles          DistanceGrouping25+ Miles 
+##                           1.963982                           1.443824 
+##       DistanceGrouping6 - 10 Miles DistanceGroupingLess than 6  Miles 
+##                           2.420304                           2.697315</code></pre>
+<p>Salary Prediction - KNN</p>
+<pre class="r"><code>#Our Lowest RMSE came with a K nearest neighbors of 7. 
+#This prediction model gives us an RMSE of $2,067 on monthly income, which falls below our $3,000 evaluation criteria.
+traind &lt;- trainControl(method = &#39;repeatedcv&#39;, number = 10, repeats = 3)
+knn_fit &lt;- train(MonthlyIncome ~ ., data = talent_factor_model_salary_Train, method = &#39;knn&#39;, trControl = traind, preProcess = c(&#39;center&#39;, &#39;scale&#39;), tuneLength = 10)
+knn_fit</code></pre>
+<pre><code>## k-Nearest Neighbors 
+## 
+## 609 samples
+##  31 predictor
+## 
+## Pre-processing: centered (50), scaled (50) 
+## Resampling: Cross-Validated (10 fold, repeated 3 times) 
+## Summary of sample sizes: 548, 548, 548, 548, 548, 547, ... 
+## Resampling results across tuning parameters:
+## 
+##   k   RMSE      Rsquared   MAE     
+##    5  2026.007  0.7976561  1496.970
+##    7  2031.210  0.8044199  1498.573
+##    9  2040.262  0.8114927  1512.838
+##   11  2077.917  0.8124091  1537.392
+##   13  2106.273  0.8147251  1558.960
+##   15  2139.589  0.8163468  1587.439
+##   17  2172.004  0.8190986  1617.564
+##   19  2209.943  0.8219897  1641.561
+##   21  2252.620  0.8220670  1671.827
+##   23  2281.932  0.8240207  1690.474
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was k = 5.</code></pre>
+<pre class="r"><code>plot(knn_fit)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<pre class="r"><code>predregtrainknn &lt;- predict(knn_fit, talent_factor_model_salary_Test)</code></pre>
+<p>Salary Prediction - Random Forest</p>
+<pre class="r"><code># Our optimal value for RMSE is $1037. However, we may be oveerfitting.
+
+rf_fit &lt;- train(MonthlyIncome ~ ., data = talent_factor_model_salary_Train, method = &#39;rf&#39;, trControl = traind, preProcess = c(&#39;center&#39;, &#39;scale&#39;), tuneLength = 10, importance=T)
+rf_fit</code></pre>
+<pre><code>## Random Forest 
+## 
+## 609 samples
+##  31 predictor
+## 
+## Pre-processing: centered (50), scaled (50) 
+## Resampling: Cross-Validated (10 fold, repeated 3 times) 
+## Summary of sample sizes: 548, 547, 548, 548, 549, 549, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  RMSE      Rsquared   MAE      
+##    2    2203.619  0.8734536  1705.7356
+##    7    1306.870  0.9271277   989.6898
+##   12    1128.539  0.9396974   853.0358
+##   18    1052.677  0.9454576   788.1337
+##   23    1033.170  0.9468346   768.9916
+##   28    1021.278  0.9477365   763.6225
+##   34    1025.240  0.9471834   766.5239
+##   39    1027.331  0.9468540   768.8841
+##   44    1033.188  0.9462615   771.4034
+##   50    1037.834  0.9458139   771.1123
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was mtry = 28.</code></pre>
+<pre class="r"><code>plot(rf_fit)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<pre class="r"><code>predregtrainrf &lt;- predict(rf_fit, talent_factor_model_salary_Test)</code></pre>
+<p>Salary Prediction - SVM</p>
+<pre class="r"><code>### SVM METHOD RMSE IS 1366 and Rsquared is .91
+
+svm_fit &lt;- train(MonthlyIncome ~ ., data = talent_factor_model_salary_Train, method = &#39;svmRadial&#39;, trControl = traind, preProcess = c(&#39;center&#39;, &#39;scale&#39;), tuneLength = 10, importance=T)
+svm_fit</code></pre>
+<pre><code>## Support Vector Machines with Radial Basis Function Kernel 
+## 
+## 609 samples
+##  31 predictor
+## 
+## Pre-processing: centered (50), scaled (50) 
+## Resampling: Cross-Validated (10 fold, repeated 3 times) 
+## Summary of sample sizes: 548, 548, 548, 549, 547, 548, ... 
+## Resampling results across tuning parameters:
+## 
+##   C       RMSE      Rsquared   MAE     
+##     0.25  1620.019  0.8984885  1224.983
+##     0.50  1397.152  0.9117547  1089.541
+##     1.00  1332.930  0.9149486  1045.716
+##     2.00  1329.860  0.9144019  1052.799
+##     4.00  1345.988  0.9119222  1074.775
+##     8.00  1355.154  0.9106512  1081.664
+##    16.00  1357.696  0.9102856  1083.667
+##    32.00  1357.696  0.9102856  1083.667
+##    64.00  1357.696  0.9102856  1083.667
+##   128.00  1357.696  0.9102856  1083.667
+## 
+## Tuning parameter &#39;sigma&#39; was held constant at a value of 0.0111475
+## RMSE was used to select the optimal model using the smallest value.
+## The final values used for the model were sigma = 0.0111475 and C = 2.</code></pre>
+<pre class="r"><code>plot(svm_fit)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre class="r"><code>predregtrainsvm &lt;- predict(svm_fit, talent_factor_model_salary_Test)</code></pre>
+<p>Feature Engineering for importance variable related to salary</p>
+<pre class="r"><code>### Variable importance of our regressor
+rfimportreg &lt;- varImp(rf_fit, scale = FALSE)
+
+plot(rfimportreg)</code></pre>
+<p><img src="EDA_Final_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<pre class="r"><code># Job Role, Age, and then Years with Current Manager are the top 3 important variables.. 
+# Job title is typically a heavier predictor in salary and the older you are, the more senior you typically are, which affects your Salary. 
+#We also have Years with Current Manager closely followed by Years in Current Role, which would make sense as it can tie back to a users job performance and raises #once they have plenty of experience working the same job with the same boss.</code></pre>
+<p>Run attrition classification on Test Data and output to csv</p>
+<pre class="r"><code>#Execute Classification model against test set and write out to csv
+talent_attrition_predict&lt;- predict(RF_talent_factor_model_train, talent_attrition_test)
+talent_attrition_merge &lt;- cbind(talent_attrition_test$ID, talent_attrition_predict)
+talent_attrition_class &lt;- as.data.frame(talent_attrition_merge)
+talent_attrition_class$Attrition &lt;- with(talent_attrition_class, ifelse(talent_attrition_predict == 1, &quot;No&quot;, &quot;Yes&quot;))
+talent_attrition_final &lt;- talent_attrition_class[,!(names(talent_attrition_class) %in% c(&quot;talent_attrition_predict&quot;))]
+#outputting data
+write.csv(talent_attrition_final,&quot;JasonHerbaugh_DDSCaseStudy2_PredictAttrition.csv&quot;,row.names = FALSE)</code></pre>
+<p>Run salary prediction on Test Data</p>
+<pre class="r"><code>#run prediction on rf classification model using our test set
+talent_salary_test$Attrition &lt;- with(talent_salary_test, ifelse(Attrition == 1, &quot;Yes&quot;, &quot;No&quot;))
+talent_salary_regression &lt;- predict(rf_fit, talent_salary_test)
+talent_salary_merge &lt;- cbind(talent_salary_test$ID, talent_salary_regression)
+talent_salary_pred &lt;- as.data.frame(talent_salary_merge)
+names(talent_salary_pred)&lt;- c(&quot;ID&quot;, &quot;MonthlySalary&quot;)
+#outputting data
+write.csv(talent_salary_pred,&quot;JasonHerbaugh_DDSCaseStudy2_PredictSalary.csv&quot;,row.names = FALSE)</code></pre>
+<p>Session Information</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 4.0.4 (2021-02-15)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 18363)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## 
+## attached base packages:
+## [1] parallel  grid      stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] HH_3.1-43           gridExtra_2.3       multcomp_1.4-15    
+##  [4] TH.data_1.0-10      survival_3.2-7      mvtnorm_1.1-1      
+##  [7] latticeExtra_0.6-29 doParallel_1.0.16   iterators_1.0.13   
+## [10] foreach_1.5.1       randomForest_4.6-14 kernlab_0.9-29     
+## [13] mboost_2.9-4        stabs_0.6-4         naivebayes_0.9.7   
+## [16] MASS_7.3-53.1       Boruta_7.0.0        mlbench_2.1-3      
+## [19] ggcorrplot_0.1.3    table1_1.2.1        ggthemes_4.2.0     
+## [22] mapproj_1.2.7       maps_3.3.0          class_7.3-18       
+## [25] e1071_1.7-4         caret_6.0-86        lattice_0.20-41    
+## [28] ggpubr_0.4.0        plotly_4.9.2.1      VIM_6.0.0          
+## [31] colorspace_1.4-1    mice_3.12.0         usmap_0.5.1        
+## [34] GGally_2.0.0        visdat_0.5.3        forcats_0.5.0      
+## [37] stringr_1.4.0       purrr_0.3.4         readr_1.4.0        
+## [40] tidyr_1.1.2         tibble_3.0.4        ggplot2_3.3.2      
+## [43] tidyverse_1.3.0     dplyr_1.0.2        
+## 
+## loaded via a namespace (and not attached):
+##   [1] readxl_1.3.1         backports_1.1.10     Hmisc_4.4-2         
+##   [4] plyr_1.8.6           lazyeval_0.2.2       sp_1.4-4            
+##   [7] splines_4.0.4        gmp_0.6-2            digest_0.6.27       
+##  [10] htmltools_0.5.0      fansi_0.4.1          checkmate_2.0.0     
+##  [13] magrittr_1.5         cluster_2.1.0        openxlsx_4.2.3      
+##  [16] recipes_0.1.15       modelr_0.1.8         gower_0.2.2         
+##  [19] sandwich_3.0-0       jpeg_0.1-8.1         rvest_0.3.6         
+##  [22] haven_2.3.1          xfun_0.19            crayon_1.3.4        
+##  [25] jsonlite_1.7.1       libcoin_1.0-6        zoo_1.8-8           
+##  [28] glue_1.4.2           gtable_0.3.0         nnls_1.4            
+##  [31] ipred_0.9-9          car_3.0-10           Rmpfr_0.8-2         
+##  [34] DEoptimR_1.0-8       abind_1.4-5          scales_1.1.1        
+##  [37] DBI_1.1.0            rstatix_0.7.0        Rcpp_1.0.5          
+##  [40] htmlTable_2.1.0      xtable_1.8-4         viridisLite_0.3.0   
+##  [43] laeken_0.5.1         foreign_0.8-81       Formula_1.2-4       
+##  [46] stats4_4.0.4         lava_1.6.8.1         prodlim_2019.11.13  
+##  [49] vcd_1.4-8            htmlwidgets_1.5.2    httr_1.4.2          
+##  [52] RColorBrewer_1.1-2   ellipsis_0.3.1       farver_2.0.3        
+##  [55] pkgconfig_2.0.3      reshape_0.8.8        nnet_7.3-15         
+##  [58] dbplyr_2.0.0         utf8_1.1.4           polynom_1.4-0       
+##  [61] labeling_0.4.2       later_1.1.0.1        tidyselect_1.1.0    
+##  [64] rlang_0.4.8          reshape2_1.4.4       munsell_0.5.0       
+##  [67] cellranger_1.1.0     tools_4.0.4          cli_2.1.0           
+##  [70] generics_0.1.0       ranger_0.12.1        broom_0.7.5         
+##  [73] fastmap_1.0.1        evaluate_0.14        yaml_2.2.1          
+##  [76] ModelMetrics_1.2.2.2 knitr_1.30           fs_1.5.0            
+##  [79] zip_2.1.1            robustbase_0.93-6    nlme_3.1-152        
+##  [82] mime_0.9             leaps_3.1            xml2_1.3.2          
+##  [85] compiler_4.0.4       rstudioapi_0.11      png_0.1-7           
+##  [88] curl_4.3             ggsignif_0.6.0       reprex_0.3.0        
+##  [91] stringi_1.5.3        Matrix_1.3-2         ggsci_2.9           
+##  [94] vctrs_0.3.4          pillar_1.4.6         lifecycle_0.2.0     
+##  [97] lmtest_0.9-38        data.table_1.13.2    httpuv_1.5.4        
+## [100] R6_2.5.0             promises_1.1.1       rio_0.5.16          
+## [103] codetools_0.2-18     boot_1.3-26          assertthat_0.2.1    
+## [106] withr_2.3.0          mgcv_1.8-33          hms_0.5.3           
+## [109] quadprog_1.5-8       rpart_4.1-15         timeDate_3043.102   
+## [112] rmarkdown_2.5        inum_1.0-3           carData_3.0-4       
+## [115] partykit_1.2-12      pROC_1.16.2          base64enc_0.1-3     
+## [118] shiny_1.5.0          lubridate_1.7.9</code></pre>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
