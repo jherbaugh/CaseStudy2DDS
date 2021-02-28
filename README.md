@@ -15,7 +15,7 @@ The Client, "DDSAnalytics ," has hired me to conduct specific analysis to identi
 
 ## Presentations
 
-* [DDS Analysis Final Presentation](https://github.com/jherbaugh/CaseStudy2DDS) - Power Point Presentation covering the questions of Interest from our EDA as well as additional insights.
+* [DDS Analytics Final Presentation](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/DDS%20Analytics%20Presentation.pptx) - Power Point Presentation covering the questions of Interest from our EDA as well as additional insights.
 
 ## Knit File in rendered html page
 
