@@ -21,19 +21,8 @@ The Client, "DDSAnalytics ," has hired me to conduct specific analysis to identi
 
 * [Knitted presentation](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/EDA_Final.html)
 
-## Data
-The Data Sets
-
+## Source Data
 * ['CaseStudy2-data.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/main/CaseStudy2-data.csv) - Soure data for talent management.
-
-* ['Case2PredictionsClassifyEXAMPLE.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2PredictionsClassifyEXAMPLE.csv) - Classification model example.
-* ['Case2PredictionsRegressEXAMPLE.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2PredictionsRegressEXAMPLE.csv) - Regression model example.
-
-* ['CaseStudy2CompSetNoAttrition.csv']('https://github.com/jherbaugh/CaseStudy2DDS/blob/main/CaseStudy2CompSet No Attrition.csv') - ValidationDataset with no attrition.
-* ['CaseStudy2CompSetNoSalary.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/CaseStudy2CompSet\ No Salary.csv.csv) - ValidationDataset with no salary.
-
-* ['Case2PredictionsHerbaughAttrition.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2Predictions_Herbaugh Attrition.csv) - Output of my RF model for classification.
-* ['Case2PredictionsHerbaughSalary.csv'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/Case2Predictions_Herbaugh Salary.csv) - Output of my RF model for regression.
 
 ## Analysis
 
