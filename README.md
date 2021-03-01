@@ -3,7 +3,7 @@ Case Study 2: DDSAnalytics
 
 # Talent Analysis 
 
-created by * [Jason Herbaugh](https://github.com/jherbaugh) 
+created by [Jason Herbaugh](https://github.com/jherbaugh) 
 
 ## Purpose
 
