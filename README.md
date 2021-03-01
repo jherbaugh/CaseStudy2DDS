@@ -24,7 +24,7 @@ The Client, "DDSAnalytics ," has hired me to conduct specific analysis to identi
 ## Data
 The Data Sets
 
-* ['Beers.csv'](https://github.com/rickfontenot/DS6306_Study1/blob/main/Beers.csv) - The US craft beers data set
+* ['CaseStudy2-data'](https://github.com/jherbaugh/CaseStudy2DDS/blob/main/CaseStudy2-data.csv) - The US craft beers data set
 
 * ['Breweries.csv'](https://github.com/rickfontenot/DS6306_Study1/blob/main/Breweries.csv) -The US craft breweries data set
 
