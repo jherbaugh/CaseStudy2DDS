@@ -1,0 +1,782 @@
+
+---
+title: "DDSAnalytics EDA"
+author: "Jason Herbaugh"
+date: "2/27/2021"
+output:
+  html_document:
+    self_contained: false
+    lib_dir: libs
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Executive Summary
+
+DDSAnalytics is an analytics company specializing in talent management solutions for Fortune 100 companies. To gain a competitive edge over the competition they want to use data science for talent management. They want to investigate employee turnover to identify factors that contribute to attrition. 
+
+Project Overview
+
+My EDA will consists of running summary statistics against the data provided. Inspecting the correlation matrix I will see what variables are multicollinear. In addition to the Boruta Feature selection,I will remove some unimportant variables from the dataset. Additionally, I will also plot interesting relationships between the variables. Finally, i will run through a multitude of models for both attrition classification and salary regression and output the results to the validation set. 
+
+
+```{r}
+options(scipen=999) #prevent scientific notation
+#Load Libraries needed for analysis
+library(dplyr)
+library(tidyverse)
+library(visdat)
+library(GGally)
+library(usmap)
+library(mice)
+library(VIM)
+library(plotly)
+library(ggpubr)
+library(caret)
+library(e1071)
+library(class)
+library(maps)
+library(mapproj)
+library(stringr)
+library(ggplot2)
+library(ggthemes)
+library(table1)
+library(ggcorrplot)
+library(mlbench)
+library(Boruta)
+library(e1071)
+library(MASS)
+library(naivebayes)
+library(mboost)
+library(kernlab)
+library(randomForest)
+library(doParallel)
+library(HH)
+```
+
+Load Light Theme for plots.
+
+```{r}
+theme_set(theme_light())
+theme_update(axis.title = element_text()) #the default for fivethirtyeight is to not show axis labels, this removes that default so we can choose to specify and display axis titles
+theme_update(plot.title = element_text(hjust = 0.5)) # changing default to center all titles
+```
+
+Load initial source data and validation datasets.
+Look at Summary Statistics.
+```{r}
+talent_raw = read.csv("https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2-data.csv", header = TRUE)
+talent_attrition_test = read.csv("https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2CompSet%20No%20Attrition.csv", header = TRUE)
+talent_salary_test = read.csv("https://raw.githubusercontent.com/jherbaugh/CaseStudy2DDS/main/CaseStudy2CompSet%20No%20Salary.csv", header = TRUE)
+
+
+#Read in Dimension of the Dataset
+dim(talent_raw) #870 observations x 36 columns
+
+
+#Summary Statistics and Glimpse into DataTypes and first observations
+glimpse(talent_raw)
+summary(talent_raw)
+```
+
+Convert characters to factors, drop columns with no variance
+```{r}
+talent_factor <- talent_raw %>%
+  mutate_if(is.character, as.factor) %>%
+  dplyr::select(Attrition, everything(), -Over18, -EmployeeCount, -StandardHours)
+
+```
+
+Investigate NA values to determine what needs resolution (Nothing is missing)
+
+```{r}
+#Verify no missing observations
+md.pattern(talent_factor)
+
+#Summary Statistics and Glimpse into DataTypes and first observations for Training
+glimpse(talent_factor)
+summary(talent_factor)
+```
+Summary Statistics on additional Data Frames for validation datasets.
+
+```{r}
+#Summary Statistics and Glimpse into DataTypes and first observations for Test sets
+summary(talent_attrition_test)
+summary(talent_salary_test)
+
+```
+Attrition Properties in source data.
+Dataset is fairly balanced.
+
+```{r}
+prop.table(table(talent_factor$Attrition))
+
+```
+
+Create data frame of continuous variables and summarize means values for attrition factor. Creation Correlation Matrix for continuous variable.
+
+```{r}
+
+talent_continuous <- talent_factor[, c("YearsWithCurrManager", "YearsSinceLastPromotion", "YearsInCurrentRole", "YearsAtCompany", "PerformanceRating",
+                                       "TotalWorkingYears", "PercentSalaryHike", "MonthlyIncome", "MonthlyRate", "HourlyRate", "DailyRate", "WorkLifeBalance", "OverTime",
+                                       "DistanceFromHome", "Age", "Attrition", "JobSatisfaction", "JobLevel", "RelationshipSatisfaction", "EnvironmentSatisfaction")]
+
+
+talent_continuous$Attrition <- as.numeric(talent_continuous$Attrition) - 1
+talent_continuous$OverTime <- as.numeric(talent_continuous$OverTime) - 1
+
+employees_left <- talent_continuous %>% filter(talent_continuous$Attrition == 1)
+employees_stayed <- talent_continuous %>% filter(talent_continuous$Attrition == 0)
+mean_employees_left <- lapply(employees_left, mean)
+mean_employees_stayed <- lapply(employees_stayed, mean)
+
+mean_employees <- merge(mean_employees_left, mean_employees_stayed, all=TRUE)
+mean_employees
+
+# Age - Left Company (Y/N)
+# - Yes = 33.78
+# - No = 37.41
+#
+# Monthly Income
+# - Yes = $4,764
+# - No = $6,702
+#
+# Job Satisfaction | Environment Satisfaction | Relationship Satisfaction
+# - Yes = 2.44       2.51                       2.61
+# - No = 2.76        2.73                       2.72
+#
+# Years with Current Manager | Years Since Last Promo | Years in Current Role
+# - Yes = 2.94                 2.13                     2.90
+# - No = 4.369863              2.17                     4.54
+#
+#  Total Working Years
+# - Yes = 8.19
+# - No = 11.60
+
+# Performance Rating | Percent Salary Hike
+# - Yes = 3.16         15.33
+# - No = 3.15          15.17  
+#
+# Work Life               | Dist from Home
+# - Yes = 2.63              10.96
+# - No = 2.80               9.02
+
+```
+
+Correlation Matrix for data
+
+```{r}
+
+correlations <- round(cor(talent_continuous), 1)
+
+# method = "circle"
+ggcorrplot(correlations, hc.order = TRUE, type = "lower",
+           lab = TRUE)
+
+# During review of the correlation matrix, we can see high instances of correlation in the variables below.
+# They will be removed in future analysis.
+#
+# High collinearity:
+# - Performance Rating with Percent Salary Hike
+# - Monthly Income with Job Level
+# - Age and Total Working years
+# - Years at Current Role with Years at Company
+# - Years at Company with Years with Current Manager
+#
+# Variables to drop :
+# - Percent Salary Hike
+# - Job Level
+# - Total Working Years
+# - Years at Company
+
+```
+
+Additional insights from data
+```{r}
+talent_factor$agegroup <- with(talent_factor, ifelse(Age < 25, "18-24", ifelse(Age < 34, "25-34", ifelse(Age < 44, "35-44", ifelse(Age < 52, "45 - 52", "Over53")))))
+talent_attrition_test$agegroup <- with(talent_attrition_test, ifelse(Age < 25, "18-24", ifelse(Age < 34, "25-34", ifelse(Age < 44, "35-44", ifelse(Age < 52, "45 - 52", "Over53")))))
+talent_salary_test$agegroup <- with(talent_salary_test, ifelse(Age < 25, "18-24", ifelse(Age < 34, "25-34", ifelse(Age < 44, "35-44", ifelse(Age < 52, "45 - 52", "Over53")))))
+age_count <- table(talent_factor$agegroup)
+barplot(age_count, main = "Age Count")
+
+
+### Mean Salary for Job Title/ Education and Salary
+
+talent_factor_jobtitle_mean <- talent_factor %>% dplyr::group_by(JobRole) %>% dplyr::summarise(MedSalary = median(MonthlyIncome, na.rm=TRUE),Meansatis= mean(JobSatisfaction, na.rm=TRUE))
+#Subsetting the job satisfaction data into top/bottoms
+mean_jobsatisfaction <- talent_factor_jobtitle_mean %>% arrange(desc(Meansatis))
+#Subsetting the salary data into top/bottoms
+mean_salary <- talent_factor_jobtitle_mean %>% arrange(desc(MedSalary))
+#Mean Job Satisfaction by Job Role
+ggplot(mean_jobsatisfaction, aes(x=reorder(JobRole,-Meansatis),y=Meansatis,fill=JobRole)) + geom_bar(stat = "identity")  + theme(plot.title = element_text(hjust=0.1), axis.text.x = element_text(hjust = 0.9, angle = 65)) + labs(x="Job Role", y="Mean Job Satisfaction", title = "Job Satisfaction by Title")
+#Median Income by Job Role
+ggplot(mean_salary, aes(x=reorder(JobRole,-MedSalary),y=MedSalary,fill=JobRole)) + geom_bar(stat = "identity")  + theme(plot.title = element_text(hjust=0.1), axis.text.x = element_text(hjust = 0.9, angle = 65)) + labs(x="Job Role", y="Median Monthly Salary", title = "Median Monthly Salary by Title")
+
+
+#Attrition plotting
+Attritionplot <- ggplot(talent_factor, aes(x=DailyRate, y=MonthlyIncome), title ='Attrition') + geom_point()
+Attritionplot + facet_wrap(~Attrition)
+Satisfactionplot <- ggplot(talent_factor, aes(x=DailyRate, y=MonthlyIncome), title ='Attrition') + geom_point()
+Attritionplot + facet_wrap(~JobSatisfaction)
+Attritionsat <- ggplot(talent_factor, aes(x=JobSatisfaction, y=MonthlyIncome), title ='Attrition') + geom_point()
+Attritionsat + facet_wrap(~Attrition)
+ggplot(talent_factor, aes(x=JobRole, fill=Attrition)) + geom_bar() +  labs(x = "Job Role", y = "Number of Employees", title = "Attrition Job Role")
+
+
+# Distance from home grouping
+talent_factor$DistanceGrouping <- with(talent_factor, ifelse(DistanceFromHome > 25, "25+ Miles", ifelse(DistanceFromHome > 18, "19 - 25 Miles", ifelse(DistanceFromHome > 10, "11 - 18 Miles", ifelse(DistanceFromHome >5, "6 - 10 Miles", "Less than 6  Miles")))))
+talent_attrition_test$DistanceGrouping <- with(talent_attrition_test, ifelse(DistanceFromHome > 25, "25+ Miles", ifelse(DistanceFromHome > 18, "19 - 25 Miles", ifelse(DistanceFromHome > 10, "11 - 18 Miles", ifelse(DistanceFromHome >5, "6 - 10 Miles", "Less than 6  Miles")))))
+talent_salary_test$DistanceGrouping <- with(talent_salary_test, ifelse(DistanceFromHome > 25, "25+ Miles", ifelse(DistanceFromHome > 18, "19 - 25 Miles", ifelse(DistanceFromHome > 10, "11 - 18 Miles", ifelse(DistanceFromHome >5, "6 - 10 Miles", "Less than 6  Miles")))))
+ggplot(talent_factor, aes(x=reorder(DistanceGrouping, DistanceFromHome), fill=Attrition)) + geom_bar()  + labs(x = "Distance From Home Group", y = "Number of Employees", title = "Attrition and Distance from Home")
+
+```
+
+GGPairs broken down by various Talent Factor classes
+
+```{r}
+##GGPairs Correlation matrix broken down into different themed groups
+##Observations based upon the output
+
+#Employee measurements
+#People that left were younger
+#People that left were less educated
+talent_employee <- talent_factor %>% dplyr::select(Attrition, Age, Education, Gender, MaritalStatus)
+ggpairs(talent_employee, aes(colour = Attrition))
+
+
+#Employer based measurements
+#Pople who left had less time in role , at company, job level, enviornment satisfication
+talent_company <- talent_factor %>% dplyr::select(Attrition, EnvironmentSatisfaction, JobInvolvement, YearsInCurrentRole, YearsAtCompany , JobLevel)
+ggpairs(talent_company, aes(colour = Attrition))
+
+
+#EmployeeWorkLifeBalance
+#Maybe distance from home
+talent_wellbeing <- talent_factor %>% dplyr::select(Attrition, BusinessTravel, DistanceFromHome, WorkLifeBalance)
+ggpairs(talent_wellbeing, aes(colour = Attrition))
+
+#Income Based Grouping
+#Not Seeing strong correlation with attrition in relation to salary. Drop OverTime, StockOptionLevel no real info. Add SalaryHike
+talent_income <- talent_factor %>% dplyr::select(Attrition, DailyRate, HourlyRate, MonthlyRate, MonthlyIncome, PercentSalaryHike )
+ggpairs(talent_income, aes(colour = Attrition))
+
+```
+
+Scatterplots of additional data points for review.
+Visually show employees who left made less, were younger, and had last time invested in the job and with the company.
+
+```{r}
+# People who left salary left made less over time
+ggscatter(
+  talent_factor, x = "TotalWorkingYears", y = "MonthlyIncome",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+# People who left made less to start but slalary increased same
+ggscatter(
+  talent_factor, x = "YearsAtCompany", y = "MonthlyIncome",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+
+# People who left had fewer total working year and years at company
+ggscatter(
+  talent_factor, x = "TotalWorkingYears", y = "YearsAtCompany",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+# People who left had fewer years with current manager / current role (to start with)
+ggscatter(
+  talent_factor, x = "YearsWithCurrManager", y = "TotalWorkingYears",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+
+# People who left had fewer years in current role (to start with)
+ggscatter(
+  talent_factor, x = "YearsInCurrentRole", y = "TotalWorkingYears",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+
+# Attrition -> People who left at 1/2 as much time at current company (to start)
+ggscatter(
+  talent_factor, x = "YearsWithCurrManager", y = "YearsAtCompany",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+
+# Attrition -> People who left at 1/2 as much time at current company (to start)
+ggscatter(
+  talent_factor, x = "YearsInCurrentRole", y = "YearsAtCompany",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+
+# Attrition -> People with left had 1/2 the time with current manager since last promotion (same as below, can remove one)
+ggscatter(
+  talent_factor, x = "YearsSinceLastPromotion", y = "YearsInCurrentRole",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+
+# Attrition -> People with left had 1/2 the time with current manager since last promotion
+ggscatter(
+  talent_factor, x = "YearsSinceLastPromotion", y = "YearsWithCurrManager",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+
+# Attrition -> High correlation with same manager and number of years in current role
+ggscatter(
+  talent_factor, x = "YearsInCurrentRole", y = "YearsWithCurrManager",
+  color = "Attrition", palette = "jco",
+  add = "reg.line"
+) +
+  facet_wrap(~Attrition) +
+  stat_cor(label.y = 5.4) +
+  stat_regline_equation()
+
+
+```
+
+Modeling our Analysis
+Global Values for seed and train and test data.
+Remove variables with high correlation.
+```{r}
+#This will be the dataset we use to model our Attrition and Salary Prediction
+set.seed(453)
+
+### Removed high correlation variables from set
+splitPerc = .70
+
+
+talent_factor_model <-  talent_factor %>% dplyr::select(everything(), -YearsAtCompany, -TotalWorkingYears, -JobLevel, -PercentSalaryHike )
+trainInd <- sample(1:dim(talent_factor_model)[1],round(splitPerc * dim(talent_factor_model)[1]))
+
+talent_factor_model_Train = talent_factor_model[trainInd,]
+talent_factor_model_Test = talent_factor_model[-trainInd,]
+```
+
+Attrition Classification - Linear Regression
+```{r}
+#Linear Model 
+talent_attrition_lm <- lm(Attrition ~., data=talent_factor_model_Train)
+talent_attrition_lm
+```
+
+Naive Bayes
+Produces lower sensitivity. Accuracy and specificity are ok.
+```{r}
+NB_model = naiveBayes(talent_factor_model_Train[,-1],as.factor(talent_factor_model_Train$Attrition),laplace = 1)
+table(predict(NB_model,talent_factor_model_Test[,-1]),as.factor(talent_factor_model_Test$Attrition))
+CM = confusionMatrix(table(predict(NB_model,talent_factor_model_Test[,-1]),as.factor(talent_factor_model_Test$Attrition)))
+
+CM
+
+
+draw_confusion_matrix <- function(cm,Class1,Class2) {
+
+  layout(matrix(c(1,1,2)))
+  par(mar=c(2,2,2,2))
+  plot(c(100, 345), c(300, 450), type = "n", xlab="", ylab="", xaxt='n', yaxt='n')
+  title('CONFUSION MATRIX', cex.main=2)
+
+  # create the matrix 
+  rect(150, 430, 240, 370, col='#3F97D0')
+  text(195, 435, Class1, cex=1.2)
+  rect(250, 430, 340, 370, col='#F7AD50')
+  text(295, 435, Class2, cex=1.2)
+  text(125, 370, 'Predicted', cex=1.3, srt=90, font=2)
+  text(245, 450, 'Actual', cex=1.3, font=2)
+  rect(150, 305, 240, 365, col='#F7AD50')
+  rect(250, 305, 340, 365, col='#3F97D0')
+  text(140, 400, Class1, cex=1.2, srt=90)
+  text(140, 335, Class2, cex=1.2, srt=90)
+
+  # add in the cm results 
+  res <- as.numeric(cm$table)
+  text(195, 400, res[1], cex=1.6, font=2, col='white')
+  text(195, 335, res[2], cex=1.6, font=2, col='white')
+  text(295, 400, res[3], cex=1.6, font=2, col='white')
+  text(295, 335, res[4], cex=1.6, font=2, col='white')
+  
+  # add in the specifics 
+  plot(c(100, 0), c(100, 0), type = "n", xlab="", ylab="", main = "DETAILS", xaxt='n', yaxt='n')
+  text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
+  text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
+  text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
+  text(30, 70, round(as.numeric(cm$byClass[2]), 3), cex=1.2)
+  text(50, 85, names(cm$byClass[5]), cex=1.2, font=2)
+  text(50, 70, round(as.numeric(cm$byClass[5]), 3), cex=1.2)
+  text(70, 85, names(cm$byClass[6]), cex=1.2, font=2)
+  text(70, 70, round(as.numeric(cm$byClass[6]), 3), cex=1.2)
+  text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
+  text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
+
+  # add in the accuracy information 
+  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
+  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+}  
+
+draw_confusion_matrix(CM,"NO","YES")
+```
+
+Random Forest.
+Best model. 70% specificity and high accuracy and sensitivity.
+
+```{r}
+RF_talent_factor_model_train <- train(Attrition ~., talent_factor_model_Train, method = 'rf', trControl = trainControl(method='repeatedcv'), importance = T)
+
+predTrain <- predict(RF_talent_factor_model_train, talent_factor_model_Test)
+confusionMatrix(table(talent_factor_model_Test$Attrition, predTrain))
+cMatrixRF <- table(predTrain, talent_factor_model_Test$Attrition)
+plot(cMatrixRF, col="blue", ylab="Actual", xlab="Predicted", main='Random Forest Confusion Matrix')
+
+
+draw_confusion_matrix <- function(cm,Class1,Class2) {
+
+  layout(matrix(c(1,1,2)))
+  par(mar=c(2,2,2,2))
+  plot(c(100, 345), c(300, 450), type = "n", xlab="", ylab="", xaxt='n', yaxt='n')
+  title('CONFUSION MATRIX', cex.main=2)
+
+  # create the matrix 
+  rect(150, 430, 240, 370, col='#3F97D0')
+  text(195, 435, Class1, cex=1.2)
+  rect(250, 430, 340, 370, col='#F7AD50')
+  text(295, 435, Class2, cex=1.2)
+  text(125, 370, 'Predicted', cex=1.3, srt=90, font=2)
+  text(245, 450, 'Actual', cex=1.3, font=2)
+  rect(150, 305, 240, 365, col='#F7AD50')
+  rect(250, 305, 340, 365, col='#3F97D0')
+  text(140, 400, Class1, cex=1.2, srt=90)
+  text(140, 335, Class2, cex=1.2, srt=90)
+
+  # add in the cm results 
+  res <- as.numeric(cm$table)
+  text(195, 400, res[1], cex=1.6, font=2, col='white')
+  text(195, 335, res[2], cex=1.6, font=2, col='white')
+  text(295, 400, res[3], cex=1.6, font=2, col='white')
+  text(295, 335, res[4], cex=1.6, font=2, col='white')
+  
+  # add in the specifics 
+  plot(c(100, 0), c(100, 0), type = "n", xlab="", ylab="", main = "DETAILS", xaxt='n', yaxt='n')
+  text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
+  text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
+  text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
+  text(30, 70, round(as.numeric(cm$byClass[2]), 3), cex=1.2)
+  text(50, 85, names(cm$byClass[5]), cex=1.2, font=2)
+  text(50, 70, round(as.numeric(cm$byClass[5]), 3), cex=1.2)
+  text(70, 85, names(cm$byClass[6]), cex=1.2, font=2)
+  text(70, 70, round(as.numeric(cm$byClass[6]), 3), cex=1.2)
+  text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
+  text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
+
+  # add in the accuracy information 
+  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
+  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+}  
+
+draw_confusion_matrix(confusionMatrix(table(talent_factor_model_Test$Attrition, predTrain)),"NO","YES")
+
+```
+
+SVM Model
+Overfitting model.
+```{r}
+
+
+svm_talent_factor_model_train <- train(Attrition ~., talent_factor_model_Train, method = 'svmRadial', trControl = trainControl(method='repeatedcv'), importance=T)
+predTrainsvm <- predict(svm_talent_factor_model_train, talent_factor_model_Test)
+confusionMatrix(table(talent_factor_model_Test$Attrition, predTrainsvm))
+cMatrixsvm <- table(predTrainsvm, talent_factor_model_Test$Attrition)
+plot(cMatrixsvm, col="blue", ylab="Actual", xlab="Predicted", main='Support Vector Machine Confusion Matrix')
+
+
+
+draw_confusion_matrix <- function(cm,Class1,Class2) {
+
+  layout(matrix(c(1,1,2)))
+  par(mar=c(2,2,2,2))
+  plot(c(100, 345), c(300, 450), type = "n", xlab="", ylab="", xaxt='n', yaxt='n')
+  title('CONFUSION MATRIX', cex.main=2)
+
+  # create the matrix 
+  rect(150, 430, 240, 370, col='#3F97D0')
+  text(195, 435, Class1, cex=1.2)
+  rect(250, 430, 340, 370, col='#F7AD50')
+  text(295, 435, Class2, cex=1.2)
+  text(125, 370, 'Predicted', cex=1.3, srt=90, font=2)
+  text(245, 450, 'Actual', cex=1.3, font=2)
+  rect(150, 305, 240, 365, col='#F7AD50')
+  rect(250, 305, 340, 365, col='#3F97D0')
+  text(140, 400, Class1, cex=1.2, srt=90)
+  text(140, 335, Class2, cex=1.2, srt=90)
+
+  # add in the cm results 
+  res <- as.numeric(cm$table)
+  text(195, 400, res[1], cex=1.6, font=2, col='white')
+  text(195, 335, res[2], cex=1.6, font=2, col='white')
+  text(295, 400, res[3], cex=1.6, font=2, col='white')
+  text(295, 335, res[4], cex=1.6, font=2, col='white')
+  
+  # add in the specifics 
+  plot(c(100, 0), c(100, 0), type = "n", xlab="", ylab="", main = "DETAILS", xaxt='n', yaxt='n')
+  text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
+  text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
+  text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
+  text(30, 70, round(as.numeric(cm$byClass[2]), 3), cex=1.2)
+  text(50, 85, names(cm$byClass[5]), cex=1.2, font=2)
+  text(50, 70, round(as.numeric(cm$byClass[5]), 3), cex=1.2)
+  text(70, 85, names(cm$byClass[6]), cex=1.2, font=2)
+  text(70, 70, round(as.numeric(cm$byClass[6]), 3), cex=1.2)
+  text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
+  text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
+
+  # add in the accuracy information 
+  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
+  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+}  
+
+draw_confusion_matrix(confusionMatrix(table(talent_factor_model_Test$Attrition, predTrainsvm)),"NO","YES")
+
+
+```
+
+Feature Engineering for importance variable related to attrition.
+Show top 3 factors of influence.
+```{r}
+### Feature Importance for Predictive ability
+# ensure results are repeatable
+# load the library
+
+
+# define the control using a random forest selection function
+control <- rfeControl(functions=rfFuncs, method="cv", number=10)
+
+# train the model
+results <- rfe(talent_factor[,2:33], talent_factor[,1], sizes=c(2:33), rfeControl=control)
+
+# summarize the results
+print(results)
+
+# list the chosen features
+predictors(results)
+
+# plot the results
+plot(results, type=c("g", "o"))
+
+
+#Boruta Feature Engineering
+boruta.talent_train <- Boruta(Attrition~., data = talent_factor, doTrace = 2)
+print(boruta.talent_train)
+
+#take a call on tentative features
+boruta.talent <- TentativeRoughFix(boruta.talent_train)
+print(boruta.talent)
+
+getSelectedAttributes(boruta.talent_train, withTentative = F)
+
+plot(boruta.talent, xlab = "", xaxt = "n")
+lz<-lapply(1:ncol(boruta.talent$ImpHistory),function(i)
+  boruta.talent$ImpHistory[is.finite(boruta.talent$ImpHistory[,i]),i])
+names(lz) <- colnames(boruta.talent$ImpHistory)
+Labels <- sort(sapply(lz,median))
+axis(side = 1,las=2,labels = names(Labels),
+     at = 1:ncol(boruta.talent$ImpHistory), cex.axis = 0.7)
+
+
+```
+
+Salary Prediction
+Remove variables with high VIF.
+```{r}
+salaryfitincome <- lm(MonthlyIncome ~ ., data = talent_factor_model_Train)
+summary(salaryfitincome)
+vif(salaryfitincome)
+
+
+talent_factor_model_salary <-  talent_factor %>% dplyr::select(everything(), -Age, -DistanceFromHome, -Department )
+trainInd <- sample(1:dim(talent_factor_model_salary)[1],round(splitPerc * dim(talent_factor_model_salary)[1]))
+
+talent_factor_model_salary_Train = talent_factor_model_salary[trainInd,]
+talent_factor_model_salary_Test = talent_factor_model_salary[-trainInd,]
+
+##Interaction rates of all the variables to see collinearity
+## Variables where we are seeing high collinearity within categorical variables, we will leave in. 
+##Significant p-value of <0.0001.
+
+#Variables with High collinearity
+
+# Age/Age Group
+# Distance Grouping
+# Department
+
+
+
+```
+
+Salary Prediction - LinearRegression
+
+```{r}
+#Job role coefficients are going to be the biggest predictors of monthly income. followed by business travel and performance rating.
+salary_predict_lm <- lm(MonthlyIncome ~., data= talent_factor_model_salary_Train)
+summary(salary_predict_lm)
+vif(salary_predict_lm)
+
+
+```
+
+Salary Prediction - KNN
+RMSE of $1950. K=5.
+```{r}
+#Our Lowest RMSE came with a K nearest neighbors of 7. 
+#This prediction model gives us an RMSE of $2,067 on monthly income, which falls below our $3,000 evaluation criteria.
+traind <- trainControl(method = 'repeatedcv', number = 10, repeats = 3)
+knn_fit <- train(MonthlyIncome ~ ., data = talent_factor_model_salary_Train, method = 'knn', trControl = traind, preProcess = c('center', 'scale'), tuneLength = 10)
+knn_fit
+plot(knn_fit)
+predregtrainknn <- predict(knn_fit, talent_factor_model_salary_Test)
+
+
+```
+
+Salary Prediction - Random Forest
+$1050 for RMSE. 22 predictors.
+```{r}
+
+# Our optimal value for RMSE is $1037. However, we may be oveerfitting.
+
+rf_fit <- train(MonthlyIncome ~ ., data = talent_factor_model_salary_Train, method = 'rf', trControl = traind, preProcess = c('center', 'scale'), tuneLength = 10, importance=T)
+rf_fit
+plot(rf_fit)
+predregtrainrf <- predict(rf_fit, talent_factor_model_salary_Test)
+
+
+
+```
+
+
+Salary Prediction - SVM 
+$1300 for RMSE
+```{r}
+### SVM METHOD RMSE IS 1366 and Rsquared is .91
+
+svm_fit <- train(MonthlyIncome ~ ., data = talent_factor_model_salary_Train, method = 'svmRadial', trControl = traind, preProcess = c('center', 'scale'), tuneLength = 10, importance=T)
+svm_fit
+plot(svm_fit)
+predregtrainsvm <- predict(svm_fit, talent_factor_model_salary_Test)
+
+
+```
+
+Feature Engineering for importance variable related to salary
+```{r}
+### Variable importance of our regressor
+rfimportreg <- varImp(rf_fit, scale = FALSE)
+
+plot(rfimportreg)
+
+
+# Job Role, Age, and then Years with Current Manager are the top 3 important variables.. 
+# Job title is typically a heavier predictor in salary and the older you are, the more senior you typically are, which affects your Salary. 
+#We also have Years with Current Manager closely followed by Years in Current Role, which would make sense as it can tie back to a users job performance and raises #once they have plenty of experience working the same job with the same boss.
+
+
+
+```
+
+Run attrition classification on Test Data and output to csv
+```{r}
+#Execute Classification model against test set and write out to csv
+talent_attrition_predict<- predict(RF_talent_factor_model_train, talent_attrition_test)
+talent_attrition_merge <- cbind(talent_attrition_test$ID, talent_attrition_predict)
+talent_attrition_class <- as.data.frame(talent_attrition_merge)
+talent_attrition_class$Attrition <- with(talent_attrition_class, ifelse(talent_attrition_predict == 1, "No", "Yes"))
+talent_attrition_final <- talent_attrition_class[,!(names(talent_attrition_class) %in% c("talent_attrition_predict"))]
+rename(talent_attrition_final, c("ID"="V1", "Attrition"="Attrition"))
+#outputting data
+write.csv(talent_attrition_final,"Case2Predictions_Herbaugh Attrition.csv",row.names = FALSE)
+
+```
+
+Run salary prediction on Test Data
+
+```{r}
+#run prediction on rf classification model using our test set
+talent_salary_test$Attrition <- with(talent_salary_test, ifelse(Attrition == 1, "Yes", "No"))
+talent_salary_regression <- predict(rf_fit, talent_salary_test)
+talent_salary_merge <- cbind(talent_salary_test$ID, talent_salary_regression)
+talent_salary_pred <- as.data.frame(talent_salary_merge)
+names(talent_salary_pred)<- c("ID", "MonthlySalary")
+#outputting data
+write.csv(talent_salary_pred,"Case2Predictions_Herbaugh Salary.csv",row.names = FALSE)
+```
+
+
+Youtube and Presentation link 
+https://www.youtube.com/watch?v=pkeAmR0H_j8
+
+Presentation
+https://github.com/jherbaugh/CaseStudy2DDS/blob/main/DDS%20Analytics%20Presentation.pptx
+```{r}
+#Powerpoint Presentation
+
+
+#Youtube Link
+#https://www.youtube.com/watch?v=pkeAmR0H_j8
+```
+
+
+
+
+Session Information
+
+```{r}
+sessionInfo()
+```
+
